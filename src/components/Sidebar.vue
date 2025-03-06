@@ -1,11 +1,11 @@
 <template>
-	<aside class="sidebar" width="auto">
-		<div v-if="isCollapse" @click="toggleCollapse" style="padding: 8px 0">
-			<el-icon :size="20"><Expand /></el-icon>
+	<aside class="sidebar">
+		<div @click="toggleCollapse" style="padding: 8px 0; cursor: pointer">
+			<el-icon :size="20">
+				<component :is="isCollapse ? Expand : Fold" />
+			</el-icon>
 		</div>
-		<div v-else @click="toggleCollapse" style="padding: 8px 0">
-			<el-icon :size="20"><Fold /></el-icon>
-		</div>
+
 		<el-menu
 			:default-active="activeMenuIndex"
 			class="el-menu-vertical-demo"
@@ -33,10 +33,9 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import router from '@/router';
 import {
-	House,
 	Promotion,
 	Document,
 	DataLine,
@@ -45,20 +44,25 @@ import {
 	Fold,
 } from '@element-plus/icons-vue';
 
-const isCollapse = ref(true);
+const isCollapse = ref(
+	JSON.parse(sessionStorage.getItem('sidebarCollapse')) ?? true,
+);
 
 const toggleCollapse = () => {
 	isCollapse.value = !isCollapse.value;
 };
-// 计算属性，根据当前路由路径来确定default-active的值
+
+// 保证在路由切换时，sidebar 不会自动缩回去
+watch(isCollapse, (newVal) => {
+	sessionStorage.setItem('sidebarCollapse', JSON.stringify(newVal));
+});
+
 const activeMenuIndex = computed(() => {
-	console.log(router.currentRoute.value.path);
 	return router.currentRoute.value.path;
 });
+
 const handleSelect = (key) => {
-	router.push({
-		path: key,
-	});
+	router.push({ path: key });
 };
 </script>
 
@@ -86,7 +90,7 @@ const handleSelect = (key) => {
 
 .el-menu-item:hover,
 .el-menu-item.is-active {
-	color: #409eff; /* Vue默认的主题色 */
+	color: #409eff;
 	background: #f0f0f0;
 }
 </style>
