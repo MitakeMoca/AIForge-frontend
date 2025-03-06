@@ -1,0 +1,272 @@
+.project {
+  //margin-top: 150px;
+  //margin-left: 200px;
+  width: 100%;
+  height: 100%;
+  background: white;
+}
+
+.the-header {
+  width: 100%;
+  height: 100px;
+  //background: #F8F8FF;
+  background: rgba(70, 130, 180, 0.1);
+  display: flex;
+}
+
+.the-body {
+  //display: flex;
+  width: 100%;
+  height: 72%;
+  //background: #409EFF;
+}
+
+.body-bottom-line {
+  //position: absolute;
+  margin-left: 10%;
+  width: 80%;
+  height: 1px;
+  background: gray;
+}
+
+.body-center {
+  //position: relative;
+  height: 95%;
+  width: 100%;
+}
+
+.chooses {
+  margin-top: 50px;
+  margin-left: 200px;
+  height: 75%;
+  overflow-y: auto;
+  display: flex;
+  flex-wrap: wrap;
+
+  .choose-block {
+    width: 25%;
+    height: 128px;
+    margin-right: 60px;
+    margin-bottom: 40px;
+    text-align: left;
+    border: 1px solid darkgrey;
+    border-radius: 10px;
+    transition: box-shadow 0.1s ease;
+    box-shadow: 0 2px 5px rgba(0, 155, 222, 0.2);
+  }
+
+  .choose-block:hover {
+    box-shadow: 0 5px 15px rgba(0, 155, 222, 0.3);
+  }
+
+  .chosen {
+    border: 1px solid mediumblue;
+  }
+
+  .tag-name {
+    margin-left: 25px;
+    font-size: 20px;
+    font-weight: bolder
+  }
+  .tag-name:hover {
+    color: #2592eb;
+  }
+  .tag-detail {
+    max-height: 64px; /* 根据需要调整最大高度 */
+    margin-left: 25px;
+    margin-right: 6px;
+    font-size: 16px;
+    overflow: hidden; /* 超出隐藏 */
+    text-overflow: ellipsis; /* 显示省略号 */
+    display: -webkit-box; /* 使用弹性盒子模型 */
+    -webkit-box-orient: vertical; /* 设置盒子的子元素排列方式为垂直 */
+    -webkit-line-clamp: 2; /* 限制文本在3行以内显示 */
+    line-height: 1.4; /* 行高，根据需要调整 */
+  }
+}
+
+.step2-center {
+  width: 100%;
+  height: 80%;
+  display: flex;
+}
+
+.step2-right {
+  width: 700px;
+  height: 100%;
+  margin-left: 20px;
+}
+
+.step3-center {
+  width: 100%;
+  height: 80%;
+}
+
+.select {
+  margin-left: 10%;
+  width: 40%;
+}
+
+.body-bottom {
+  margin-top: 20px;
+  margin-left: 40%;
+  display: flex;
+}
+
+.button {
+  display: flex;
+  width: 120px;
+  height: 50px;
+  margin-right: 50px;
+  position: relative;
+  background: #2563eb;
+  border-radius: 8px;
+}
+
+.button:hover {
+  background: #4a90e2;
+}
+
+.body-leftSide:hover {
+  background: #CFCFCF;
+}
+
+.step {
+  display: flex;
+  margin: 30px 120px 0 80px;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.step-number {
+  cursor: pointer;
+  background-color: #fff;
+  border: 2px solid #ccc;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.step-label {
+  font-size: 18px;
+  margin: 10px;
+}
+
+
+.step.active .step-number {
+  border-color: #4a90e2;
+  color: #4a90e2;
+}
+
+.step.completed .step-label {
+  color: #4a90e2;
+}
+
+.step.completed .step-number {
+  background-color: #4a90e2;
+  color: #fff;
+}
+
+.step-line {
+  width: 120px;
+  height: 1px;
+  background-color: #ccc;
+  position: absolute;
+  top: 30%;
+  left: 120%;
+}
+
+.dataset {
+  .active {
+    color: #6495ED;
+    font-weight: bold;
+    border-bottom: 4px solid #6495ED;
+  }
+
+  .header {
+    height: 55px;
+  }
+
+  .center {
+    height: 400px;
+    overflow: hidden;
+    overflow-y: scroll;
+  }
+
+  .selected {
+    border: 3px solid #2563eb !important;
+  }
+
+  .dataset-item {
+    display: flex;
+    width: 100%;
+    height: 80px;
+    margin: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .dataset-item:hover {
+    background: rgba(240, 248, 255, 0.7);
+  }
+
+
+}
+
+.model-parameters {
+  max-width: 400px;
+  margin-left: 200px;
+  height: 75%;
+  //background: #409EFF;
+  text-align: left;
+
+  .parameter {
+    margin-bottom: 20px;
+  }
+
+  .parameter label {
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  .parameter input {
+    width: 100%;
+    padding: 8px;
+    height: 45px;
+    box-sizing: border-box;
+    border-radius: 7px;
+  }
+
+  .parameter p {
+    font-size: 0.9em;
+    color: #555;
+  }
+
+}
+
+.test {
+  margin-left: 30px;
+  width: 100px;
+  height: 25px;
+  border: solid 1px darkgray;
+  border-radius: 5px;
+  display: flex;
+  > span {
+    font-size: 14px;
+    margin-left: 10px;
+    color: #aca527;
+    cursor: pointer;
+  }
+  transition: transform 0.3ms ease;
+}
+.test:hover {
+  transform: scale(1.03);
+  background: rgba(160, 160, 160, 0.1);
+}
+
+

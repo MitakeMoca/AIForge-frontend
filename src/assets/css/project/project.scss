@@ -1,0 +1,69 @@
+.project {
+  width: 100%;
+  padding-top: 60px;
+  height: 90%;
+
+  overflow-y: hidden;
+  .project-top {
+    display: flex;
+  }
+
+  .project-middle {
+    display: flex;
+
+    .item {
+      font-size: 24px;
+      margin-left: 40px;
+      cursor: pointer;
+    }
+  }
+
+  .project-body {
+    margin: 40px;
+    width: 90%;
+    height: 75%;
+  }
+
+}
+
+.separator {
+  margin-left: 40px;
+  width: 90%;
+  height: 1px;
+  background: #D3D3D3;
+}
+
+.active {
+  font-weight: bold;
+  padding-bottom: 10px;
+  border-bottom: 4px solid #409EFF;
+  border-radius: 3px;
+}
+
+.create-project-button {
+  margin-top: 30px;
+  margin-left: 70%;
+  border-radius: 7px;
+  padding-top: 5px;
+  cursor: pointer;
+  transition: transform 0.3ms ease;
+}
+
+.create-project-button:hover {
+  transform: scale(1.05);
+
+}
+
+.input {
+  margin-top: 50px;
+  margin-left: 30px;
+  height: 40px;
+  width: 600px;
+  border-radius: 8px;
+  border: 1px solid #d1d1d1;
+  outline-color: #409EFF;
+}
+
+.input:hover {
+  border-color: #409EFF;
+}

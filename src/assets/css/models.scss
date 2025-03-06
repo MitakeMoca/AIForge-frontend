@@ -1,0 +1,175 @@
+.pipeline-container {
+  
+  min-height: 100vh;
+  width: 100%;
+  //padding: 20px;
+  background-color: #f5f7fa;
+
+
+
+  .type_choose {
+    text-align: left;
+    margin-bottom: 20px;
+  }
+
+  .header {
+    padding: 0;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px; /* 增加标题与内容之间的间距 */
+  }
+
+  .filter-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+
+    .search-input {
+      flex-grow: 1;
+    }
+
+    .select {
+      width: 150px; /* 固定选择框宽度，以保持布局整洁 */
+    }
+  }
+
+  .tabs {
+    margin-bottom: 20px;
+  }
+
+  .pipeline-card {
+    cursor: pointer;
+    transition: box-shadow 0.3s, transform 0.2s;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    background-color: #fff;
+    overflow: hidden;
+
+    &:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      transform: translateY(-5px); /* 添加轻微的提升效果 */
+    }
+
+    .card-content {
+      padding: 10px;
+      display: flex;
+      align-items: flex-start; /* 确保所有子元素左对齐 */
+      height: 100%;
+    }
+    
+    /* 为每个需要固定宽度的元素设置宽度 */
+    .model-id-a,
+    .model-id {
+      text-align: left;
+      font-weight: 500;
+      margin-bottom: 10px;
+      width: 150px; /* 固定宽度 */
+    }
+    
+    .model-name {
+      text-align: left;
+      font-size: 1.2em;
+      font-weight: bold;
+      margin-bottom: 10px;
+      width: 800px; /* 固定宽度 */
+    }
+    
+    .model-tags {
+      margin-bottom: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      width: 100%; /* 占满父容器的宽度 */
+      
+      .el-tag {
+        margin: 0; /* 移除默认边距 */
+      }
+    }
+    
+    .time {
+      color: #909399;
+      width: 500px; /* 固定宽度，确保所有卡片的时间对齐 */
+    }
+    
+    .status {
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      width: 150px; /* 固定宽度 */
+      
+      .el-tag {
+        &.warning {
+          background-color: #e6a23c;
+          color: white;
+        }
+    
+        &.success {
+          background-color: #67c23a;
+          color: white;
+        }
+    
+        &.danger {
+          background-color: #f56c6c;
+          color: white;
+        }
+      }
+    }
+    
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: flex-end;
+      width: 100%; /* 占满父容器的宽度 */
+      
+      .el-link {
+        color: #f56c6c; /* 删除链接的颜色 */
+      }
+    }
+  }
+
+  .scrollable-pipeline-list {
+    max-height: 100%;
+    overflow-y: auto;
+    padding-right: 10px;
+
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: #dcdfe6;
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background-color: #f5f5f5;
+    }
+  }
+
+  .fixed-id {
+    width: 80px;
+    flex-shrink: 0;
+    text-align: left;
+    line-height: 1.5;
+    padding-left: 5px;
+  }
+
+  .tags{
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+}
+
+.optionandfilter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.el-checkbox__label {
+  white-space: normal; /* 允许换行 */
+  overflow: visible; /* 确保内容完全显示 */
+}

@@ -1,0 +1,100 @@
+.el-container {
+  background-image: url('@/static/Pay.png');
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.el-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0;
+  background-color: #f0f2f5;
+  border-bottom: 1px solid #e8e8e8;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  h1 {
+    margin-right: 20px;
+  }
+}
+
+.el-main {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.back {
+  position: fixed;
+  top: 25px;
+  left: 25px;
+
+  .el-button {
+    width: 75px;
+    height: 40px;
+  }
+}
+
+.plan-details {
+  width: 15%;
+  text-align: center;
+  margin: 20px 0;
+  background-color: rgba(255, 255, 255, 0.85);
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  position: absolute;
+  top: 100px;
+  padding: 20px;
+  margin: 0 10px;
+
+  h2 {
+    margin-bottom: 10px;
+  }
+
+  p {
+    font-size: 16px;
+    color: #666;
+  }
+}
+
+.el-table {
+  margin-top: 20px;
+  border: 1px solid #e8e8e8;
+}
+
+.el-table th {
+  background-color: #f7f7f7;
+  color: #555;
+  font-weight: 600;
+  border-bottom: 1px solid #ddd;
+}
+
+.el-table td {
+  color: #666;
+}
+
+.el-table .cell {
+  padding: 10px;
+}
+
+.el-table__row {
+  cursor: pointer;
+}
+
+.el-table__row:hover {
+  background-color: #eef1f6;
+}
+
+.plan-selection-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+} 

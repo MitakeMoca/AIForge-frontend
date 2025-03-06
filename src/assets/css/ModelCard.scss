@@ -1,0 +1,82 @@
+.model-card {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: left;
+  }
+  .model-card:hover {
+    background: linear-gradient(135deg, #d0eaff 0%, #f0fbff 100%);
+  }
+  .header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .description {
+    margin: 10px 0;
+    color: #666;
+  }
+  .date {
+    margin: 10px 0;
+    color: #4caf50;
+  }
+  
+
+  .tags {
+    display: inline-flex;
+    align-items: center;
+    color: #409EFF; /* Element Plus 蓝色 */
+    background-color: #f0faff; /* 浅蓝色背景 */
+    padding: 4px 8px; /* 内边距 */
+    margin-right: 5px; /* 外边距 */
+    font-size: 14px; /* 字体大小 */
+    border-radius: 4px; /* 圆角 */
+    border: 1px solid #d0e8ff; /* 边框颜色 */
+}
+
+.tags svg {
+    margin-right: 4px; /* 图标与文本的间距 */
+    fill: #409EFF; /* 图标颜色 */
+}
+  .support {
+    color: #4caf50;
+    margin-bottom: 10px;
+    font-size: 12px;
+  }
+  
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .author {
+    font-weight: bold;
+  }
+  
+  .stats {
+    display: flex;
+    gap: 10px;
+    color: #999;
+    font-size: 15px;
+  }
+
+
+.stat-item {
+    display: flex;
+    align-items: center;
+}
+
+.icon {
+    margin-right: 5px;
+    font-size: 16px;
+}
+
+.number {
+    font-weight: bold;
+    margin-right: 5px;
+}

@@ -1,0 +1,124 @@
+.model-detail {
+  padding: 20px;
+  background-color: #f9f9f9;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.model-header {
+  background-color: #f0f4f8;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.breadcrumb {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.header-content {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.title-section {
+  max-width: 70%;
+}
+
+.model-name {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.info {
+  font-size: 14px;
+  color: #999;
+  margin-bottom: 10px;
+}
+
+.model-description {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.tags {
+  margin-top: 10px;
+}
+
+.tag {
+  background-color: #e0f7fa;
+  border-radius: 5px;
+  padding: 5px 10px;
+  margin-right: 5px;
+  font-size: 14px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.action-button, .like-button, .share-button {
+  background-color: #409EFF;
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 10px;
+  transition: background-color 0.3s;
+}
+
+.action-button:hover, .like-button:hover, .share-button:hover {
+  background-color: #409EFF;
+}
+
+.tabs {
+  display: flex;
+  margin: 20px 0;
+}
+
+.tabs button {
+  padding: 10px 20px;
+  border: none;
+  background-color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  margin-right: 10px;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.tabs button.active {
+  background-color: #409EFF;
+  color: #fff;
+}
+
+.overview, .comments {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.markdown-content {
+  text-align: left;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  margin-top: 10px;
+  border-radius: 8px;
+}
+p {
+  margin-bottom: 16px; /* 或者其他合适的值 */
+}

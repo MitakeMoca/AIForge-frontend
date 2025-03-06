@@ -1,0 +1,50 @@
+{
+  "name": "frontend",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test:e2e": "start-server-and-test preview http://localhost:4173 'cypress run --e2e'",
+    "test:e2e:dev": "start-server-and-test 'vite dev --port 4173' http://localhost:4173 'cypress open --e2e'",
+    "test:unit": "cypress run --component",
+    "test:unit:dev": "cypress open --component"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1",
+    "axios": "^1.7.7",
+    "blob": "^0.1.0",
+    "blob-polyfill": "^9.0.20240710",
+    "cors": "^2.8.5",
+    "dompurify": "^3.2.2",
+    "element-plus": "^2.9.0",
+    "frontend": "file:",
+    "global": "^4.4.0",
+    "highlight.js": "^11.11.0",
+    "jszip": "^3.10.1",
+    "katex": "^0.16.18",
+    "lucide-vue-next": "^0.465.0",
+    "markdown-it": "^14.1.0",
+    "markdown-it-katex": "^2.0.3",
+    "markdown-it-texmath": "^1.0.0",
+    "marked": "^15.0.3",
+    "sockjs": "^0.3.24",
+    "sockjs-client": "^1.6.1",
+    "stompjs": "^2.3.3",
+    "vue": "^3.4.29",
+    "vue-markdown": "^2.2.4",
+    "vue-markdown-render": "^2.2.1",
+    "vue-router": "^4.4.5"
+  },
+  "devDependencies": {
+    "@types/dompurify": "^3.2.0",
+    "@vitejs/plugin-vue": "^5.0.5",
+    "cypress": "^13.12.0",
+    "less": "^4.2.1",
+    "sass-embedded": "^1.80.5",
+    "start-server-and-test": "^2.0.4",
+    "vite": "^5.3.1"
+  }
+}

@@ -1,0 +1,362 @@
+.search-container {
+  width: 60vw;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  max-height: 100vh; /* 使容器占满整个视口高度 */
+  overflow-y: hidden;
+  position: relative; /* 为.search-container设置相对定位 */
+  z-index: 1; /* 确保.search-container在背景层之上 */
+}
+
+.search-container::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(79, 70, 229, 0.05); /* 这里可以设置你想要的背景颜色或透明度 */
+  z-index: -10; /* 确保背景在.search-container内容的后面 */
+}
+
+.search-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding-top: 64px;
+  padding-bottom: 20px;
+}
+
+.results-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-right: 10px; /* 为滚动条留出空间 */
+  margin-bottom: 36px;
+  padding-top: 10px;
+}
+
+.search-bar {
+  display: flex;
+  gap: 10px;
+  max-width: 1200px;
+  margin: 48px auto 20px;
+  user-select: none;
+}
+
+.search-input-wrapper {
+  position: relative;
+  flex-grow: 1;
+}
+
+.search-input {
+  width: 95%;
+  padding: 12px 0 12px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.clear-button {
+  position: absolute;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px;
+}
+
+.search-button {
+  padding: 12px 24px;
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.search-button:hover {
+  background-color: #4338ca;
+}
+
+.categories {
+  display: flex;
+  justify-content: center;
+  gap: 96px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  user-select: none;
+}
+
+.category-button {
+  padding: 8px 16px;
+  border: none;
+  background: none;
+  color: #6b7280;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 16px;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+.category-button:hover {
+  color: #4f46e5;
+  background-color: #f3f4f6;
+}
+
+.category-button.active {
+  background-color: #4f46e5;
+  color: white;
+}
+
+.search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.result-card {
+  text-align: left;
+  padding: 10px 10px 10px 24px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  background-color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 12px;
+}
+
+.result-card:hover {
+  border-color: #4f46e5;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.result-type {
+  display: inline-block;
+  padding: 4px 8px;
+  color: #ffffff; /* 设置文字颜色为白色 */
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  background-image: linear-gradient(to right top, #0059ff, #00e1ff); /* 左下角到右上角的蓝色渐变 */
+  user-select: none;
+  overflow: hidden;
+}
+
+.result-title {
+  display: inline-block;
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #333;
+  margin: 0 0 8px 24px;
+  max-width: 50%;
+  white-space: nowrap; /* 保持文本在一行内 */
+  overflow: hidden; /* 隐藏溢出的文本 */
+  text-overflow: ellipsis; /* 显示省略号 */
+}
+
+.result-header {
+  display: flex;
+  align-items: center; /* 垂直居中对齐 */
+  padding: 8px 0;
+}
+.result-info {
+  display: inline-block;
+  font-size: 0.9em;
+  color: #999;
+  white-space: nowrap; /* 防止换行 */
+  margin-right: 24px;
+}
+.result-info-noMargin {
+  display: inline-block;
+  font-size: 0.9em;
+  color: #999;
+  white-space: nowrap; /* 防止时间戳换行 */
+}
+
+.result-description {
+  padding: 8px;
+  background-color: #fff;
+  border-top: 1px solid #ddd;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  white-space: nowrap; /* 防止文本自动换行 */
+  overflow: hidden; /* 隐藏溢出的文本 */
+  text-overflow: ellipsis; /* 使用省略号表示溢出的文本 */
+  color: #666;
+}
+
+.result-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.meta-icon {
+  font-size: 12px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 96px 48px;
+  color: #6b7280;
+  font-size: 16px;
+  user-select: none;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 16px;
+}
+
+.pagination-button {
+  padding: 8px 16px;
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.pagination-button:hover:not(:disabled) {
+  background-color: #4338ca;
+}
+
+.pagination-button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.page-info {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* 自定义滚动条样式 */
+.results-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.results-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.results-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.results-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* 响应式设计 */
+@media (max-width: 640px) {
+  .search-container {
+    padding: 10px;
+  }
+
+  .search-header {
+    padding-bottom: 10px;
+  }
+
+  .search-bar {
+    flex-direction: column;
+  }
+
+  .search-button {
+    width: 100%;
+  }
+
+  .categories {
+    gap: 8px;
+  }
+
+  .category-button {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  .pagination {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+.initial-search-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  user-select: none;
+}
+
+.pagination-button {
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.pagination-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-info {
+  margin: 0 1rem;
+}
+.custom-list {
+  list-style-type: none; /* 移除默认项目符号 */
+  text-align: left;
+  color: #6b7280; /* 灰色文本 */
+}
+
+.list-item {
+  margin-bottom: 0.5rem; /* 下边距 */
+  display: flex;
+  align-items: center;
+}
+
+.checkmark {
+  color: #22c55e; /* 绿色勾号 */
+  margin-right: 0.5rem; /* 右边距 */
+}
+
