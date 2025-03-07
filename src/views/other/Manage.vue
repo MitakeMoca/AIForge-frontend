@@ -1,7 +1,7 @@
 <template>
 	<el-container class="manage-box" v-loading="state.loading">
 		<el-header>
-			<span class="logo-text">AIForge</span>
+			<span class="logo-text" @click="router.push('/')">AIForge</span>
 			<div class="platform">
 				<el-icon>
 					<Cpu />
