@@ -14,19 +14,19 @@
 		>
 			<el-menu-item index="/square">
 				<el-icon :size="30"><Promotion /></el-icon>
-				<template #title>探索</template>
+				<template #title><span>探索</span></template>
 			</el-menu-item>
 			<el-menu-item index="/project">
 				<el-icon :size="30"><Document /></el-icon>
-				<template #title>项目</template>
+				<template #title><span>项目</span></template>
 			</el-menu-item>
 			<el-menu-item index="/models">
 				<el-icon :size="30"><DataLine /></el-icon>
-				<template #title>模型</template>
+				<template #title><span>模型</span></template>
 			</el-menu-item>
 			<el-menu-item index="/data">
 				<el-icon :size="30"><Coin /></el-icon>
-				<template #title>数据</template>
+				<template #title><span>数据</span></template>
 			</el-menu-item>
 		</el-menu>
 	</aside>
@@ -84,8 +84,20 @@ const handleSelect = (key) => {
 .el-menu-item {
 	display: flex;
 	align-items: center;
+	justify-content: center;
+	padding: 0 20px;
 	font-size: 16px;
 	color: #666;
+	position: relative;
+}
+
+.el-menu-item .el-icon {
+	position: absolute;
+	left: 20px;
+}
+
+.el-menu-item span {
+	text-align: center;
 }
 
 .el-menu-item:hover,
