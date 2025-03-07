@@ -147,6 +147,7 @@ const runProject = (item) => {
 	flex-direction: column;
 	background: #ffffff;
 	border-radius: 12px;
+	border: 2px solid #ccc; /* 增加了显眼的边框 */
 	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 	overflow: hidden;
 	transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -200,13 +201,12 @@ const runProject = (item) => {
 	position: absolute;
 	bottom: 0;
 	width: 100%;
-	background-color: rgba(0, 0, 0, 0.6);
+	background-color: rgba(0, 0, 0, 0.7);
 	padding: 8px;
-	text-align: center;
 }
 
 .status {
-	font-size: 14px;
+	font-size: 16px;
 	color: white;
 	font-weight: bold;
 }
@@ -218,7 +218,7 @@ const runProject = (item) => {
 	color: #2ecc71;
 }
 .init {
-	color: #ff99cc;
+	color: #9b59b6;
 }
 .stopped {
 	color: #e74c3c;
@@ -240,6 +240,11 @@ const runProject = (item) => {
 .run-icon {
 	width: 45px;
 	height: 45px;
+}
+
+.delete-icon {
+	width: 40px;
+	height: 40px;
 }
 
 .run-icon:hover,
