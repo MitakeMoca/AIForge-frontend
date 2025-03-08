@@ -125,11 +125,16 @@
 								label="模型日期"
 								width="160px"
 							/>
-							<el-table-column
-								prop="modelDescription"
-								label="模型描述"
-								width="160px"
-							/>
+							<el-table-column label="模型描述" width="160px">
+								<template #default="scope">
+									<div
+										class="text-clamp"
+										v-tooltip="scope.row.modelDescription"
+									>
+										{{ scope.row.modelDescription }}
+									</div>
+								</template>
+							</el-table-column>
 							<el-table-column
 								prop="modelRunCount"
 								label="运行次数"
@@ -196,11 +201,16 @@
 								label="模型日期"
 								width="160px"
 							/>
-							<el-table-column
-								prop="modelDescription"
-								label="模型描述"
-								width="160px"
-							/>
+							<el-table-column label="模型描述" width="160px">
+								<template #default="scope">
+									<div
+										class="text-clamp"
+										v-tooltip="scope.row.modelDescription"
+									>
+										{{ scope.row.modelDescription }}
+									</div>
+								</template>
+							</el-table-column>
 							<el-table-column
 								prop="modelRunCount"
 								label="运行次数"
@@ -384,11 +394,16 @@
 								label="项目名"
 								width="120px"
 							/>
-							<el-table-column
-								prop="description"
-								label="描述"
-								width="120px"
-							/>
+							<el-table-column label="描述" width="120px">
+								<template #default="scope">
+									<div
+										class="text-clamp"
+										v-tooltip="scope.row.description"
+									>
+										{{ scope.row.description }}
+									</div>
+								</template>
+							</el-table-column>
 							<el-table-column
 								prop="userId"
 								label="用户ID"
@@ -470,7 +485,16 @@
 							/>
 							<el-table-column prop="label" label="标签" />
 							<el-table-column prop="userId" label="用户ID" />
-							<el-table-column prop="introduction" label="介绍" />
+							<el-table-column label="介绍" width="200px">
+								<template #default="scope">
+									<div
+										class="text-clamp"
+										v-tooltip="scope.row.introduction"
+									>
+										{{ scope.row.introduction }}
+									</div>
+								</template>
+							</el-table-column>
 							<el-table-column fixed="right" label="删除">
 								<template #default="scope" label="关闭">
 									<el-button
@@ -833,5 +857,15 @@ const back = () => {
 	.button-container {
 		margin-top: 20px;
 	}
+}
+
+.text-clamp {
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 5; /* 限制最多显示2行 */
+	overflow: hidden;
+	text-overflow: ellipsis;
+	word-break: break-word;
+	cursor: pointer;
 }
 </style>
