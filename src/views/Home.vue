@@ -59,7 +59,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import Log from '@/components/Log.vue';
+import Log from '@/components/home/Log.vue';
 import { ElMessage } from 'element-plus';
 import router from '@/router/index.js';
 import { getLocal, isEmptyValue } from '@/utils/utils.js';

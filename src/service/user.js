@@ -2,16 +2,16 @@ import axios from '../utils/axios'
 
 // 返回所有的User列表
 export function findAllUser() {
-  return axios.post('/User/findAll',{})
+  return axios.get('/User',{})
 }
 
 //根据UserId删除对应user
 export function deleteUser(params) {
-  return axios.post('/User/del', params)
+  return axios.delete('/User/del', params)
 }
 
 export function login(params) {
-  return axios.post('/User/login', params)
+  return axios.get('/User/login', params)
 }
 
 export function logout() {
@@ -19,7 +19,7 @@ export function logout() {
 }
 
 export function register(params) {
-  return axios.post('/User/registerbyemail', params)
+  return axios.put('/User', params)
 }
 
 //输入UserId，返回包括imageUrl在内的所有user信息(不需要密码)
@@ -29,6 +29,7 @@ export function getUser(params) {
 
 // 发送验证码
 export function sendVerificationCode(params){
+  print(params)
   return axios.post('/User/sendVerificationCode', params)
 }
 
