@@ -2,20 +2,16 @@ import axios from '../utils/axios'
 
 // 返回所有的User列表
 export function findAllUser() {
-  return axios.get('/User',{})
+  return axios.get('/User')
 }
 
 //根据UserId删除对应user
 export function deleteUser(params) {
-  return axios.delete('/User/del', params)
+  return axios.delete(`${params.UserId}`)
 }
 
 export function login(params) {
-  return axios.get('/User/login', params)
-}
-
-export function logout() {
-  return axios.post('/user/logout')
+  return axios.get(`/User/${params.UserId}/${params.Password}`)
 }
 
 export function register(params) {

@@ -288,11 +288,12 @@ const submit = async () => {
 				Email: email.value,
 				VerificationCode: verificationCode.value,
 			};
+			console.log('moca');
 			loginByVerificationCode(params)
 				.then(async (res) => {
 					if (res.resultCode === 200) {
 						ElMessage.success('登录成功');
-						await setLocal('userId', res.data.userId);
+						await setLocal('userId', res.data['user_id']);
 						router.push({ path: '/square' });
 					} else {
 						ElMessage.error('登录失败');
@@ -303,11 +304,12 @@ const submit = async () => {
 				});
 		} else {
 			params = { UserId: loginInfo.value, Password: password.value };
+			console.log(params);
 			login(params)
 				.then(async (res) => {
 					if (res.resultCode === 200) {
 						ElMessage.success('登录成功');
-						await setLocal('userId', res.data.userId);
+						await setLocal('userId', res.data['user_id']);
 						router.push({ path: '/square' });
 					} else {
 						ElMessage.error('登录失败');
@@ -332,6 +334,7 @@ const submit = async () => {
 			.then(async (res) => {
 				if (res.resultCode === 200) {
 					ElMessage.success('注册成功');
+					await setLocal('userId', res.data['user_id']);
 					router.push({ path: '/square' });
 				} else {
 					ElMessage.error('注册失败');
