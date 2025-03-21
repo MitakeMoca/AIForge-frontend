@@ -16,6 +16,7 @@ export function getHyparaByProjectId(params) {
     return axios.post('/Hypara/getbyid', params);
 }
 
+// 新增超参数信息
 export function createHyparaField(params) {
-    return axios.post('/Hypara/createHyparaField', params);
+    return axios.put('/Hypara/', {hyperparameters: params});
 }

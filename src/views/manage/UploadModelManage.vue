@@ -22,7 +22,7 @@
 					<el-input v-model="model.imageId"></el-input>
 				</el-form-item>
 				<el-form-item label="用户ID">
-					<el-input v-model="model['user_id']"></el-input>
+					<el-input v-model="model.userId"></el-input>
 				</el-form-item>
 				<el-form-item label="是否公开">
 					<el-input v-model="model.isPublic"></el-input>
@@ -151,19 +151,20 @@ const deleteModel = (index) => {
 const uploadModel = async (model) => {
 	const formData = new FormData();
 	const file = model.modelFileList[0].raw;
-	formData.append('modelFile', file);
-	formData.append('modelName', model.modelName);
-	formData.append('modelDescription', model.modelDescription);
-	formData.append('modelOverviewMarkdown', model.modelOverviewMarkdown);
-	formData.append('modelFrame', model.modelFrame);
-	formData.append('imageId', model.imageId);
-	formData.append('userId', model.userId);
-	formData.append('isPublic', model.isPublic);
+	formData.append('model_file', file);
+	formData.append('model_name', model.modelName);
+	formData.append('model_description', model.modelDescription);
+	formData.append('model_overview', model.modelOverviewMarkdown);
+	formData.append('frame', model.modelFrame);
+	formData.append('image_id', model.imageId);
+	formData.append('user_id', model.userId);
+	formData.append('pub', model.isPublic);
 	formData.append('tag', model.tag);
 
-	// 上传超参数
+	// 上传超参数，返回超参数存储的路径
 	const hyperparametersResult = await uploadHyperparameters(model);
-	formData.append('hyparaPath', hyperparametersResult);
+	formData.append('hypara_path', hyperparametersResult);
+	console.log(model);
 
 	const response = await addModel(formData);
 	const resultCode = response.resultCode || '';
