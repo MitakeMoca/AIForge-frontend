@@ -246,7 +246,6 @@ const sendVC = async () => {
 	}
 	isCodeSending.value = true;
 	const params = { email: email.value };
-	print(params);
 	await sendVerificationCode(params)
 		.then((res) => {
 			ElMessage.success(`验证码已经发送到 ${email.value} ，请注意查收`);

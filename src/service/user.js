@@ -2,7 +2,7 @@ import axios from '../utils/axios'
 
 // 返回所有的User列表
 export function findAllUser() {
-  return axios.get('/User')
+  return axios.get('/User/')
 }
 
 //根据UserId删除对应user
@@ -15,7 +15,7 @@ export function login(params) {
 }
 
 export function register(params) {
-  return axios.put('/User', params)
+  return axios.put('/User/', params)
 }
 
 //输入UserId，返回包括imageUrl在内的所有user信息(不需要密码)

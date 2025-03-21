@@ -4,6 +4,8 @@ import ModelDetail from '../views/Model/ModelDetail.vue';
 import ProjectConfig from "@/views/project/ProjectConfig.vue";
 import MyProject from "@/views/project/MyProject.vue";
 import MyCollect from "@/views/project/MyCollect.vue";
+
+import Manage from '@/views/manage/Manage.vue';
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -88,7 +90,7 @@ const router = createRouter({
     {
       path: '/manage',
       name: 'manage',
-      component: () => import('@/views/other/Manage.vue'),
+      component: Manage,
     },
     {
       path: '/data',
