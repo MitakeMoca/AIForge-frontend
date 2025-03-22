@@ -36,7 +36,7 @@
 	</el-table>
 </template>
 
-<script>
+<script setup>
 import { reactive, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
 import { Check, Delete } from '@element-plus/icons-vue';

@@ -36,7 +36,7 @@
 	</el-table>
 </template>
 
-<script>
+<script setup>
 import { reactive, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
 import { Check, Close, Delete } from '@element-plus/icons-vue';
@@ -70,6 +70,7 @@ const setwaiting = async (ModelId) => {
 
 onMounted(async () => {
 	const response = await findAllModelPublic();
+	console.log(`output->response`, response);
 	state.models = response.data;
 });
 </script>
