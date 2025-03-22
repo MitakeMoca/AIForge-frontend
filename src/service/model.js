@@ -159,7 +159,7 @@ export function getParamsByModelId(modelId) {
 }
 //添加模型
 export function addModel(params) {
-  console.log(params.value)
+  console.log(params)
   return axios.put('/Model/', params, {
       headers: {
           'Content-Type': 'multipart/form-data'
