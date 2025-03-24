@@ -17,12 +17,12 @@ export function findModelByUserId(userId) {
 }
 // 返回公开的Model列表
 export function findAllModelPublic() {
-  return axios.get('/Model/allPublic', {})
+  return axios.get('/Model/public', {})
 }
 
 // 返回待审核的Model列表
 export function findAllModelWaiting() {
-  return axios.get('/Model/allWaiting', {})
+  return axios.get('/Model/waiting', {})
 }
 
 // 返回私有的Model列表
@@ -49,7 +49,8 @@ export function setPrivate(params) {
 }
 
 export function setWaiting(params) {
-  return axios.put('/Model/setWaiting', params)
+  console.log(`output->params`,params)
+  return axios.post(`/Model/waiting/${params.modelId}`)
 }
 
 // 获取基础模型列表
