@@ -95,6 +95,7 @@ import JSZip, { forEach } from 'jszip';
 import axios from 'axios';
 import { ElProgress, ElButton, ElDialog } from 'element-plus';
 import { getLocal } from '@/utils/local';
+import { add_dataset } from '@/service/dataset.js';
 
 const options = [
 	'计算机视觉',
@@ -253,7 +254,7 @@ const submitData = async () => {
 		DataUrl: './root/data/dataset/37',
 	};
 
-	const response2 = await axios.post('/Dataset/add', data);
+	const response2 = await add_dataset(data);
 	uploading.value = true;
 	uploadProgress.value = 0;
 

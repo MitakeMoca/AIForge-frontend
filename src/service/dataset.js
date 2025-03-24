@@ -37,3 +37,9 @@ export function downloadData(params) {
     responseType: 'blob'
   });
 }
+
+export function add_dataset(params) {
+  return axios.put('/Dataset/', params, {
+    responseType: 'blob'
+  });
+}
