@@ -20,7 +20,7 @@ export function register(params) {
 
 //输入UserId，返回包括imageUrl在内的所有user信息(不需要密码)
 export function getUser(params) {
-  return axios.get(`/User/${UserId}`)
+  return axios.get(`/User/${params.UserId}`)
 }
 
 // 发送验证码

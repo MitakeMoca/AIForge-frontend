@@ -2,7 +2,7 @@ import axios from '../utils/axios'
 
 // 返回所有的Dataset列表
 export function findAllDataset() {
-  return axios.get('/Dataset/findAllDatasets')
+  return axios.get('/Dataset/')
 }
 
 export function getAllPublicDataset() {
@@ -20,7 +20,7 @@ export function findDatasetByKeyword(keyword) {
 
 // 根据UserId返回该用户所拥有的Dataset列表
 export function findDatasetbyUserid(params) {
-  return axios.post('Dataset/findByUserId', params)
+  return axios.get(`Dataset/findByUserId/${params.UserId}`, params)
 }
 
 export function findDatasetById(id) {

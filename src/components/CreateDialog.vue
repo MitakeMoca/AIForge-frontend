@@ -245,7 +245,7 @@ const submitData = async () => {
 	}
 	const data = {
 		project_id: -1,
-		data_set_name: name.value,
+		dataset_name: name.value,
 		data_type: 'ZIP',
 		data_size: parseFloat(formatSize(totalSize.value)),
 		label: formData.value.tag,
@@ -261,10 +261,10 @@ const submitData = async () => {
 	const formData2 = new FormData();
 
 	formData2.append('file', files.value[0]);
-	formData2.append('UserId', getLocal('userId'));
+	formData2.append('user_id', getLocal('userId'));
 	try {
 		console.log('开始上传');
-		const response = await axios.post('/Dataset/uploadFile', formData2, {
+		const response = await axios.put('/Dataset/uploadFile', formData2, {
 			headers: {
 				'Content-Type': 'multipart/form-data',
 			},
