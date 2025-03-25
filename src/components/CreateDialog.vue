@@ -244,14 +244,14 @@ const submitData = async () => {
 		return; // 终止函数
 	}
 	const data = {
-		ProjectId: -1,
-		DataSetName: name.value,
-		DataType: 'ZIP',
-		DataSize: parseFloat(formatSize(totalSize.value)),
-		Label: formData.value.tag,
-		UserId: getLocal('userId'),
-		Introduction: formData.value.description,
-		DataUrl: './root/data/dataset/37',
+		project_id: -1,
+		data_set_name: name.value,
+		data_type: 'ZIP',
+		data_size: parseFloat(formatSize(totalSize.value)),
+		label: formData.value.tag,
+		user_id: getLocal('userId'),
+		introduction: formData.value.description,
+		data_url: './root/data/dataset/37',
 	};
 
 	const response2 = await add_dataset(data);
