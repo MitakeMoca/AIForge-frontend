@@ -174,6 +174,3 @@ export function addModel(params) {
 export function getModelDetails(params) {
   return axios.post('/Model/getTagDescrip', params);
 }
-
-
-
