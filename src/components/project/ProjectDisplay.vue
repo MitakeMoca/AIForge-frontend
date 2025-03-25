@@ -136,9 +136,9 @@ const runProject = (item) => {
 
 .project-list {
 	display: flex;
+	gap: 50px;
 	flex-wrap: wrap;
-	gap: 20px;
-	justify-content: space-between;
+	justify-content: flex-start;
 }
 
 .project-item {
