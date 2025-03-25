@@ -1,14 +1,4 @@
-import axios from '../utils/axios';
-// 查询所有类型的标签
-export async function getAllModelTags(){
-  try {
-    const response = await axios.get('/Model/getAllTags');
-    return response;
-  } catch (error) {
-    console.error('获取所有标签出错：', error);
-    throw error;
-  }
-}
+import axios from '@/utils/axios';
 // 增加模型浏览量的函数
 export async function incrementModelViewCount(modelId) {
   try {
@@ -22,7 +12,7 @@ export async function incrementModelViewCount(modelId) {
 // 查询所有公开的模型简介的函数
 export async function getAllModelSummaries() {
     try {
-      const response = await axios.get('/Model/allPublic');
+      const response = await axios.get('/Model/public');
       return response;
     } catch (error) {
       console.error('获取所有公开的模型简介出错：', error);

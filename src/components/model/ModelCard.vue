@@ -87,9 +87,9 @@ const formattedDate = computed(() => {
 });
 
 const truncatedDescription = computed(() => {
-	return props.model.modelDescription.length > 100
-		? props.model.modelDescription.slice(0, 100) + '...'
-		: props.model.modelDescription;
+	return props.model['model_description'].length > 100
+		? props.model['model_description'].slice(0, 100) + '...'
+		: props.model['model_description'];
 });
 
 function goToModelDetail(modelId) {
@@ -104,6 +104,8 @@ function getTagType(tag) {
 	};
 	return tagTypes[tag] || 'default';
 }
+
+console.log(props.model);
 </script>
 
 <style scoped>

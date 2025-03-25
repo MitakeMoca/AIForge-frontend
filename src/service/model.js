@@ -58,8 +58,7 @@ export function getAllBasicModels(params) {
   return axios.post('/backend/Model/getAllBasicModels', params)
 }
 
-export async function getAllTagsByModelid(modelId)
-{
+export async function getAllTagsByModelid(modelId) {
   try{
     const response = await axios.get(`/Model/findTagsByModelId/${modelId}`);
     return response;
@@ -69,6 +68,10 @@ export async function getAllTagsByModelid(modelId)
     console.error("Error fetching model details:", error);
         throw error;
   }
+}
+
+export async function getAllTagsName() {
+	return await axios.get('/Tags/name');
 }
 
 //根据模型ID获取模型详情
