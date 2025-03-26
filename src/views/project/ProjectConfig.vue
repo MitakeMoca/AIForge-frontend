@@ -64,7 +64,7 @@
 						>
 							<p class="tag-name">{{ item }}</p>
 							<div class="tag-detail">
-								{{ showTagDetail(item) }}
+								{{ tagDetails[item] }}
 							</div>
 						</div>
 						<el-dialog
@@ -104,7 +104,7 @@
 					</div>
 					<div class="step2-center">
 						<div class="select">
-							<el-form :rules="rules" :model="form" ref="form">
+							<el-form :rules="rules" :model="form">
 								<el-form-item
 									size="large"
 									label="选择模型"
@@ -112,16 +112,16 @@
 								>
 									<el-select
 										style="width: 400px"
-										value-key="modelId"
 										v-model="form.model"
 										size="large"
 										placeholder="请选择模型"
+										value-key="id"
 										clearable
 									>
 										<el-option
 											v-for="model in models"
-											:key="model.modelId"
-											:label="model.modelName"
+											:key="model.id"
+											:label="model.model_name"
 											:value="model"
 										></el-option>
 									</el-select>
@@ -246,7 +246,7 @@
 															text-align: left;
 														"
 													>
-														{{ item.dataSetName }}
+														{{ item.dataset_name }}
 													</p>
 													<p
 														style="
@@ -294,7 +294,7 @@
 											v-if="item === form.testSet"
 										></test-icon>
 										<span style="margin: 0 30px 0 10px">{{
-											item.dataSetName
+											item.dataset_name
 										}}</span>
 										<delete-icon
 											style="cursor: pointer"
@@ -355,7 +355,7 @@
 									style="text-align: left"
 									v-html="
 										markdownEditor.render(
-											form.model.modelOverviewMarkdown,
+											form.model.model_overview_markdown,
 										)
 									"
 								></div>
@@ -380,7 +380,7 @@
 
 						<div class="model-parameters">
 							<h2>请设置模型参数</h2>
-							<p>{{ form.model.modelName }}</p>
+							<p>{{ form.model.model_name }}</p>
 							<p>参数说明详见技术文档</p>
 							<el-scrollbar>
 								<div
@@ -511,7 +511,6 @@ import {
 	findModelById,
 	findModelByUserId,
 	getModelsByProjectType,
-	getParamsByModelId,
 } from '@/service/model.js';
 import {
 	getProject,
@@ -520,6 +519,7 @@ import {
 	updateProjectTypeOfProject,
 	updateTestSetOfProject,
 } from '@/service/project.js';
+import { getHyparaByModelId } from '@/service/hypara.js';
 import { getTagDetail } from '@/service/tag.js';
 import {
 	addHyparaOfProject,
@@ -527,6 +527,7 @@ import {
 	getHyparaByProjectId,
 } from '@/service/hypara.js';
 import { getUser } from '@/service/user.js';
+import { ElNotification } from 'element-plus';
 
 const route = useRoute();
 const router = useRouter();
@@ -591,14 +592,17 @@ const displayedDataset = ref([]);
 const vipLevel = ref('');
 const datasetSelectedCount = ref(0);
 
-const form = reactive({
+const form = ref({
 	ProjectType: '',
 	model: null,
 	dataset: [],
 	testSet: null,
 	trainSet: null,
 	params: {},
+	model_id: 0,
 });
+
+const form2 = ref({});
 
 const hyperparameters = ref({});
 
@@ -632,17 +636,15 @@ onMounted(async () => {
 		if (resProject?.data) {
 			const data = resProject.data;
 			if (data.projectType) {
-				form.ProjectType = data['project_type'];
+				form.value.ProjectType = data['project_type'];
 				const res = await getModelsByProjectType(data['project_type']);
 				models.value = res.data;
 				currentStep.value = 1;
 			}
 			if (data['model_id'] !== -1) {
 				const modelRes = await findModelById(data['model_id']);
-				form.model = modelRes.data;
-				const paramRes = await getParamsByModelId(
-					form.model['model_id'],
-				);
+				form.value.model = modelRes.data;
+				const paramRes = await getHyparaByModelId(form.value.model.id);
 				hyperparameters.value = paramRes.data;
 				currentStep.value = 2;
 			}
@@ -685,11 +687,14 @@ onMounted(async () => {
 	}
 
 	const personalDsRes = await findDatasetbyUserid({ UserId: userId.value });
+	console.log(`output->personalDsRes`, personalDsRes);
 	personalDatasets.value = personalDsRes.data;
 	displayedDataset.value = personalDatasets.value;
 	const publicDsRes = await getAllPublicDataset();
+	console.log(`output->publicDsRes`, publicDsRes);
 	publicDatasets.value = publicDsRes.data;
 	initSelected();
+	fetchTagDetail();
 });
 
 function goBack() {
@@ -701,40 +706,44 @@ function goPay() {
 function previousStep() {
 	if (currentStep.value > 1) currentStep.value--;
 }
-function showTagDetail(tagName) {
-	getTagDetail({ tagName })
-		.then((res) => res.data.description)
-		.catch(() => '暂无详细描述');
-	return '暂无详细描述';
+const tagDetails = ref({});
+async function fetchTagDetail(tagName) {
+	for (let tag in projectTypes) {
+		const description = (await getTagDetail(projectTypes[tag])).data
+			.description;
+		tagDetails.value[projectTypes[tag]] = description;
+	}
 }
+
 function nextStep() {
 	if (currentStep.value === 1) {
-		if (!form.ProjectType)
+		if (!form.value.ProjectType)
 			return ElNotification({ message: '请选择任务', type: 'warning' });
-		getModelsByProjectType(form.ProjectType).then(
-			(res) => (models.value = res.data),
-		);
+		getModelsByProjectType(form.value.ProjectType).then((res) => {
+			models.value = res.data;
+		});
 		currentStep.value++;
 	} else if (currentStep.value === 2) {
-		if (!form.model)
+		if (!form.value.model)
 			return ElNotification({
 				message: '请选择您的模型',
 				type: 'warning',
 			});
-		if (form.dataset.length !== 2)
+		if (form.value.dataset.length !== 2)
 			return ElNotification({
 				message: '请添加您的数据集',
 				type: 'warning',
 			});
-		if (!form.testSet)
+		if (!form.value.testSet)
 			return ElNotification({
 				message: '请选择您的测试集',
 				type: 'warning',
 			});
-		getParamsByModelId(form.model.modelId).then(
-			(res) => (hyperparameters.value = res.data),
-		);
-		form.params = {};
+		getHyparaByModelId(form.value.model.id).then((res) => {
+			hyperparameters.value = res.data;
+			console.log(`output->hyparares`, res);
+		});
+		form.value.params = {};
 		currentStep.value++;
 	} else if (currentStep.value === 3) {
 		currentStep.value++;
@@ -744,14 +753,14 @@ function nextStep() {
 }
 function chooseProjectType(item) {
 	projectTypeForChange.value = item;
-	if (form.ProjectType !== item) changeProjectTypeDialog.value = true;
+	if (form.value.ProjectType !== item) changeProjectTypeDialog.value = true;
 }
 function changeProjectType() {
-	form.model = null;
-	form.dataset = [];
-	form.testSet = {};
-	form.params = {};
-	form.ProjectType = projectTypeForChange.value;
+	form.value.model = null;
+	form.value.dataset = [];
+	form.value.testSet = {};
+	form.value.params = {};
+	form.value.ProjectType = projectTypeForChange.value;
 	projectTypeForChange.value = '';
 	clearSelected();
 	changeProjectTypeDialog.value = false;
@@ -761,13 +770,14 @@ function cancelSelect() {
 	showAddDatasetDialog.value = false;
 }
 function handleSelect() {
-	form.dataset = [];
-	form.trainSet = null;
-	form.testSet = null;
+	form.value.dataset = [];
+	form.value.trainSet = null;
+	form.value.testSet = null;
 	[...personalDatasets.value, ...publicDatasets.value].forEach((ds) => {
-		if (ds.selected && !form.dataset.includes(ds)) form.dataset.push(ds);
+		if (ds.selected && !form.value.dataset.includes(ds))
+			form.value.dataset.push(ds);
 	});
-	if (form.dataset.length > 0) {
+	if (form.value.dataset.length > 0) {
 		showDatasetDialog.value = false;
 		ElNotification({ message: '添加成功', type: 'success' });
 	} else {
@@ -791,12 +801,16 @@ function selectDataset(item) {
 	}
 }
 function selectAsTestSet(item) {
-	form.testSet = item;
-	form.trainSet = form.dataset.find((d) => d.dataSetId !== item.dataSetId);
+	form.value.testSet = item;
+	form.value.trainSet = form.value.dataset.find(
+		(d) => d.dataSetId !== item.dataSetId,
+	);
 }
 function initSelected() {
 	[...personalDatasets.value, ...publicDatasets.value].forEach((ds) => {
-		ds.selected = form.dataset.some((d) => d.dataSetId === ds.dataSetId);
+		ds.selected = form.value.dataset.some(
+			(d) => d.dataSetId === ds.dataSetId,
+		);
 	});
 }
 function clearSelected() {
@@ -821,7 +835,7 @@ function saveConfig() {
 	});
 	updateModelOfProject({
 		ProjectId: projectId.value,
-		modelId: form.model.modelId,
+		modelId: form.value.model.modelId,
 	});
 	updateDatasetOfProject({
 		ProjectId: projectId.value,
@@ -839,5 +853,267 @@ function saveConfig() {
 </script>
 
 <style scoped>
-@import '../../assets/css/project/createProject.scss';
+.project {
+	width: 100%;
+	height: 100%;
+	background: white;
+}
+
+.the-header {
+	width: 100%;
+	height: 100px;
+	background: rgba(70, 130, 180, 0.1);
+	display: flex;
+}
+
+.the-body {
+	width: 100%;
+	height: 72%;
+}
+
+.body-bottom-line {
+	margin-left: 10%;
+	width: 80%;
+	height: 1px;
+	background: gray;
+}
+
+.body-center {
+	height: 95%;
+	width: 100%;
+}
+
+.chooses {
+	margin-top: 50px;
+	margin-left: 200px;
+	height: 75%;
+	overflow-y: auto;
+	display: flex;
+	flex-wrap: wrap;
+
+	.choose-block {
+		width: 25%;
+		height: 128px;
+		margin-right: 60px;
+		margin-bottom: 40px;
+		text-align: left;
+		border: 1px solid darkgrey;
+		border-radius: 10px;
+		transition: box-shadow 0.1s ease;
+		box-shadow: 0 2px 5px rgba(0, 155, 222, 0.2);
+		cursor: pointer;
+	}
+
+	.choose-block:hover {
+		box-shadow: 0 5px 15px rgba(0, 155, 222, 0.3);
+	}
+
+	.chosen {
+		border: 1px solid mediumblue;
+	}
+
+	.tag-name {
+		margin-left: 25px;
+		font-size: 20px;
+		font-weight: bolder;
+	}
+	.choose-block:hover > .tag-name {
+		color: #2592eb;
+	}
+	.tag-detail {
+		max-height: 64px; /* 根据需要调整最大高度 */
+		margin-left: 25px;
+		margin-right: 6px;
+		font-size: 16px;
+		overflow: hidden; /* 超出隐藏 */
+		text-overflow: ellipsis; /* 显示省略号 */
+		display: -webkit-box; /* 使用弹性盒子模型 */
+		-webkit-box-orient: vertical; /* 设置盒子的子元素排列方式为垂直 */
+		-webkit-line-clamp: 2; /* 限制文本在3行以内显示 */
+		line-height: 1.4; /* 行高，根据需要调整 */
+	}
+}
+
+.step2-center {
+	width: 100%;
+	height: 80%;
+	display: flex;
+}
+
+.step2-right {
+	width: 700px;
+	height: 100%;
+	margin-left: 20px;
+}
+
+.step3-center {
+	width: 100%;
+	height: 80%;
+}
+
+.select {
+	margin-left: 10%;
+	width: 40%;
+}
+
+.body-bottom {
+	margin-top: 20px;
+	margin-left: 40%;
+	display: flex;
+}
+
+.button {
+	display: flex;
+	width: 120px;
+	height: 50px;
+	margin-right: 50px;
+	position: relative;
+	background: #2563eb;
+	border-radius: 8px;
+}
+
+.button:hover {
+	background: #4a90e2;
+}
+
+.body-leftSide:hover {
+	background: #cfcfcf;
+}
+
+.step {
+	display: flex;
+	margin: 30px 120px 0 80px;
+	flex-direction: column;
+	align-items: center;
+	position: relative;
+}
+
+.step-number {
+	cursor: pointer;
+	background-color: #fff;
+	border: 2px solid #ccc;
+	border-radius: 50%;
+	width: 40px;
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 20px;
+}
+
+.step-label {
+	font-size: 18px;
+	margin: 10px;
+}
+
+.step.active .step-number {
+	border-color: #4a90e2;
+	color: #4a90e2;
+}
+
+.step.completed .step-label {
+	color: #4a90e2;
+}
+
+.step.completed .step-number {
+	background-color: #4a90e2;
+	color: #fff;
+}
+
+.step-line {
+	width: 120px;
+	height: 1px;
+	background-color: #ccc;
+	position: absolute;
+	top: 30%;
+	left: 120%;
+}
+
+.dataset {
+	.active {
+		color: #6495ed;
+		font-weight: bold;
+		border-bottom: 4px solid #6495ed;
+	}
+
+	.header {
+		height: 55px;
+	}
+
+	.center {
+		height: 400px;
+		overflow: hidden;
+		overflow-y: scroll;
+	}
+
+	.selected {
+		border: 3px solid #2563eb !important;
+	}
+
+	.dataset-item {
+		display: flex;
+		width: 100%;
+		height: 80px;
+		margin: 10px;
+		cursor: pointer;
+		transition: 0.3s;
+	}
+
+	.dataset-item:hover {
+		background: rgba(240, 248, 255, 0.7);
+	}
+}
+
+.model-parameters {
+	max-width: 400px;
+	margin-left: 200px;
+	height: 75%;
+	text-align: left;
+
+	.parameter {
+		margin-bottom: 20px;
+	}
+
+	.parameter label {
+		display: block;
+		margin-bottom: 5px;
+	}
+
+	.parameter input {
+		width: 100%;
+		padding: 8px;
+		height: 45px;
+		box-sizing: border-box;
+		border-radius: 7px;
+	}
+
+	.parameter p {
+		font-size: 0.9em;
+		color: #555;
+	}
+}
+
+.test {
+	margin-left: 30px;
+	width: 100px;
+	height: 25px;
+	border: solid 1px darkgray;
+	border-radius: 5px;
+	display: flex;
+	> span {
+		font-size: 14px;
+		margin-left: 10px;
+		color: #aca527;
+		cursor: pointer;
+	}
+	transition: transform 0.3ms ease;
+}
+.test:hover {
+	transform: scale(1.03);
+	background: rgba(160, 160, 160, 0.1);
+}
+
+.button {
+	cursor: pointer;
+}
 </style>

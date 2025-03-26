@@ -53,6 +53,7 @@
     border-radius: 10px;
     transition: box-shadow 0.1s ease;
     box-shadow: 0 2px 5px rgba(0, 155, 222, 0.2);
+    cursor: pointer;
   }
 
   .choose-block:hover {
@@ -68,7 +69,7 @@
     font-size: 20px;
     font-weight: bolder
   }
-  .tag-name:hover {
+  .choose-block:hover>.tag-name {
     color: #2592eb;
   }
   .tag-detail {

@@ -16,3 +16,7 @@ export function addHyparaOfProject(params) {
 export function createHyparaField(params) {
     return axios.put('/Hypara/', {hyperparameters: params});
 }
+
+export function getHyparaByModelId(modelId) {
+    return axios.get(`/Hypara/getHyparaPathByModelId/${modelId}`);
+}

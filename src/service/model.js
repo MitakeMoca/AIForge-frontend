@@ -97,7 +97,7 @@ export async function getMyModels(userId) {
 }
 
 export function getModelsByProjectType(projectType) {
-    return axios.get(`/Model/getModelIdsByTagName/${projectType}`);
+    return axios.get(`/Model/getModelsByTagName/${projectType}`);
 }
 
 // 获取指定标签筛选后的基础模型列表，比如在多选框选中”语言模型“、”多模态“等等
@@ -153,9 +153,6 @@ export function addToFavorites(id) {
   return axios.post('/backend/Model/addToFavorites', { id })
 }
 
-export function getParamsByModelId(modelId) {
-    return axios.get(`/Model/getHyparaPathByModelId/${modelId}`);
-}
 //添加模型
 export function addModel(params) {
   return axios.put('/Model/', params, {

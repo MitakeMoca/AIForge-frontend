@@ -182,7 +182,6 @@ import { getLocal } from '@/utils/local';
 import Stomp from 'stompjs';
 import SockJS from 'sockjs-client/dist/sockjs.min.js';
 import { getFile, getPicture } from '@/service/project';
-import { getParamsByModelId } from '@/service/model';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github.css';
 import Blob from 'blob-polyfill';
