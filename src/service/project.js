@@ -22,18 +22,18 @@ export function createProject(params) {
 }
 
 export function updateProjectTypeOfProject(params) {
-    return axios.put('/Project/update/projectType', params);
+    return axios.post(`/Project/projectType/${params.project_id}/${params.project_type}`);
 }
 export function updateModelOfProject(params) {
-    return axios.put('/Project/update/model', params);
+    return axios.post(`/Project/model/${params.project_id}/${params.model_id}`);
 }
 
-export function updateDatasetOfProject(params) {
-    return axios.put('/Project/update/train_dataset', params);
+export function updateTrainSetOfProject(params) {
+    return axios.post(`/Project/train_dataset/${params.project_id}/${params.dataset_id}`);
 }
 
 export function updateTestSetOfProject(params) {
-    return axios.put('/Project/update/test_dataset', params);
+    return axios.post(`/Project/test_dataset/${params.project_id}/${params.dataset_id}`);
 }
 
 //根据ProjectId, 获取project的全部内容

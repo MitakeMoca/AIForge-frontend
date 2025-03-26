@@ -514,7 +514,7 @@ import {
 } from '@/service/model.js';
 import {
 	getProject,
-	updateDatasetOfProject,
+	updateTrainSetOfProject,
 	updateModelOfProject,
 	updateProjectTypeOfProject,
 	updateTestSetOfProject,
@@ -527,7 +527,7 @@ import {
 	getHyparaByProjectId,
 } from '@/service/hypara.js';
 import { getUser } from '@/service/user.js';
-import { ElNotification } from 'element-plus';
+import { ElNotification, ElMessage } from 'element-plus';
 
 const route = useRoute();
 const router = useRouter();
@@ -602,8 +602,6 @@ const form = ref({
 	model_id: 0,
 });
 
-const form2 = ref({});
-
 const hyperparameters = ref({});
 
 const rules = {
@@ -654,10 +652,10 @@ onMounted(async () => {
 					DatasetId: Number(data.train_dataset_id),
 				});
 				if (dsRes.data) {
-					form.dataset.push(dsRes.data);
+					form.value.dataset.push(dsRes.data);
 					dsRes.data.selected = true;
 					datasetSelectedCount.value++;
-					form.trainSet = dsRes.data;
+					form.value.trainSet = dsRes.data;
 					currentStep.value = 2;
 				}
 			}
@@ -680,7 +678,7 @@ onMounted(async () => {
 			if (pathRes.data.length) pathRes.data[pathRes.data.length - 1];
 			if (path) {
 				const hyRes = await findHyparaByPath({ StorePath: path });
-				form.params = hyRes.data;
+				form.value.params = hyRes.data;
 				currentStep.value = 3;
 			}
 		}
@@ -741,6 +739,7 @@ function nextStep() {
 			});
 		getHyparaByModelId(form.value.model.id).then((res) => {
 			hyperparameters.value = res.data;
+			delete hyperparameters.value[''];
 			console.log(`output->hyparares`, res);
 		});
 		form.value.params = {};
@@ -803,13 +802,13 @@ function selectDataset(item) {
 function selectAsTestSet(item) {
 	form.value.testSet = item;
 	form.value.trainSet = form.value.dataset.find(
-		(d) => d.dataSetId !== item.dataSetId,
+		(d) => d.dataset_id !== item.dataset_id,
 	);
 }
 function initSelected() {
 	[...personalDatasets.value, ...publicDatasets.value].forEach((ds) => {
 		ds.selected = form.value.dataset.some(
-			(d) => d.dataSetId === ds.dataSetId,
+			(d) => d.dataset_id === ds.dataset_id,
 		);
 	});
 }
@@ -822,33 +821,42 @@ function clearSelected() {
 function deleteSelectedDataset() {
 	showDeleteSelectedDataset.value = false;
 	selectedDatasetForDelete.value.selected = false;
-	const index = form.dataset.indexOf(selectedDatasetForDelete.value);
-	if (index !== -1) form.dataset.splice(index, 1);
+	const index = form.value.dataset.indexOf(selectedDatasetForDelete.value);
+	if (index !== -1) form.value.dataset.splice(index, 1);
 	datasetSelectedCount.value--;
-	if (selectedDatasetForDelete.value === form.testSet) form.testSet = null;
+	if (selectedDatasetForDelete.value === form.value.testSet)
+		form.value.testSet = null;
 	selectedDatasetForDelete.value = '';
 }
 function saveConfig() {
+	console.log(`output->form.value`, form.value);
 	updateProjectTypeOfProject({
-		ProjectId: projectId.value,
-		ProjectType: form.ProjectType,
+		project_id: projectId.value,
+		project_type: form.value.ProjectType,
 	});
 	updateModelOfProject({
-		ProjectId: projectId.value,
-		modelId: form.value.model.modelId,
+		project_id: projectId.value,
+		model_id: form.value.model.id,
 	});
-	updateDatasetOfProject({
-		ProjectId: projectId.value,
-		DatasetId: form.trainSet.dataSetId,
+	updateTrainSetOfProject({
+		project_id: projectId.value,
+		dataset_id: form.value.trainSet.dataset_id,
 	});
 	updateTestSetOfProject({
-		ProjectId: projectId.value,
-		DatasetId: form.testSet.dataSetId,
+		project_id: projectId.value,
+		dataset_id: form.value.testSet.dataset_id,
 	});
-	const params = { ...form.params, ProjectId: projectId.value };
+	const params = {
+		params: { ...form.value.params },
+		project_id: projectId.value,
+	};
 	addHyparaOfProject(params);
 	saveDialog.value = false;
 	router.push('/project');
+	ElMessage({
+		message: '创建项目成功',
+		type: 'success',
+	});
 }
 </script>
 

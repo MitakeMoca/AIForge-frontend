@@ -9,7 +9,10 @@ export function findHyparaByPath(params) {
 }
 
 export function addHyparaOfProject(params) {
-    return axios.post('/Hypara/add', params);
+    let project_id = params.project_id
+    delete params.project_id
+    console.log(`output->params`, params)
+    return axios.post(`/Hypara/add/${project_id}`, params);
 }
 
 // 新增超参数信息

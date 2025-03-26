@@ -6,7 +6,7 @@ export function findAllModel(pub) {
 }
 
 export function findModelById(id) {
-    return axios.get(`/Model/findbymodelid/${id}`)
+    return axios.get(`/Model/${id}`)
 }
 // 根据关键字模糊查询模型（同时对框架、名称、描述搜索）
 export function findModelByKeyword(params) {
