@@ -58,13 +58,13 @@
 					<div class="chooses">
 						<div
 							class="choose-block"
-							:class="{ chosen: this.form.ProjectType === item }"
+							:class="{ chosen: form.ProjectType === item }"
 							@click="chooseProjectType(item)"
-							v-for="item in this.projectTypes"
+							v-for="item in projectTypes"
 						>
 							<p class="tag-name">{{ item }}</p>
 							<div class="tag-detail">
-								{{ getTagDetail(item) }}
+								{{ showTagDetail(item) }}
 							</div>
 						</div>
 						<el-dialog
@@ -82,7 +82,7 @@
 								>
 								<el-button
 									type="primary"
-									@click="changeProjectType()"
+									@click="changeProjectType"
 									>确认</el-button
 								>
 							</span>
@@ -123,8 +123,7 @@
 											:key="model.modelId"
 											:label="model.modelName"
 											:value="model"
-										>
-										</el-option>
+										></el-option>
 									</el-select>
 								</el-form-item>
 								<br />
@@ -150,7 +149,8 @@
 											font-size: 16px;
 											cursor: pointer;
 										"
-										>添加新的数据集
+									>
+										添加新的数据集
 									</el-button>
 
 									<el-dialog
@@ -302,8 +302,7 @@
 												showDeleteSelectedDataset = true;
 												selectedDatasetForDelete = item;
 											"
-										>
-										</delete-icon>
+										></delete-icon>
 									</div>
 
 									<div
@@ -332,8 +331,9 @@
 										<el-button
 											type="primary"
 											@click="deleteSelectedDataset()"
-											>确认</el-button
 										>
+											确认
+										</el-button>
 									</span>
 								</el-dialog>
 							</el-form>
@@ -355,8 +355,7 @@
 									style="text-align: left"
 									v-html="
 										markdownEditor.render(
-											this.form.model
-												.modelOverviewMarkdown,
+											form.model.modelOverviewMarkdown,
 										)
 									"
 								></div>
@@ -364,6 +363,7 @@
 						</el-scrollbar>
 					</div>
 				</div>
+
 				<div style="height: 100%" v-if="currentStep === 3">
 					<div class="step3-center">
 						<div>
@@ -380,23 +380,24 @@
 
 						<div class="model-parameters">
 							<h2>请设置模型参数</h2>
-							<p>{{ this.form.model.modelName }}</p>
+							<p>{{ form.model.modelName }}</p>
 							<p>参数说明详见技术文档</p>
 							<el-scrollbar>
 								<div
 									class="parameter"
-									v-for="(value, key) in this.hyperparameters"
+									v-for="(value, key) in hyperparameters"
 								>
 									<label
 										for="classNum"
 										style="font-weight: bold"
-										>{{ key }} *
+									>
+										{{ key }} *
 									</label>
 									<p>{{ value }}</p>
 									<input
 										style="font-size: 18px"
 										id="classNum"
-										v-model="this.form.params[key]"
+										v-model="form.params[key]"
 									/>
 								</div>
 							</el-scrollbar>
@@ -413,7 +414,7 @@
 							margin-top: 100px;
 						"
 					>
-						您当前的VIP等级为：{{ this.vipLevel }}
+						您当前的VIP等级为：{{ vipLevel }}
 					</p>
 					<p
 						style="
@@ -477,9 +478,9 @@
 					</p>
 					<span slot="footer">
 						<el-button @click="saveDialog = false">取消</el-button>
-						<el-button type="primary" @click="saveConfig()"
-							>确认</el-button
-						>
+						<el-button type="primary" @click="saveConfig()">
+							确认
+						</el-button>
 					</span>
 				</el-dialog>
 			</div>
@@ -487,13 +488,20 @@
 	</div>
 </template>
 
-<script>
+<script setup>
+import { ref, reactive, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import MarkdownIt from 'markdown-it';
+import { getLocal } from '@/utils/local.js';
+
 import PreviousStepIcon from '@/assets/icon/PreviousStepIcon.vue';
 import BackIcon from '@/assets/icon/BackIcon.vue';
 import TickIcon from '@/assets/icon/TickIcon.vue';
 import DatasetIcon from '@/assets/icon/DatasetIcon.vue';
 import DeleteIcon from '@/assets/icon/DeleteIcon.vue';
 import CreateDialog from '@/components/CreateDialog.vue';
+import TestIcon from '@/assets/icon/TestIcon.vue';
+
 import {
 	findDatasetById,
 	findDatasetbyUserid,
@@ -502,7 +510,6 @@ import {
 import {
 	findModelById,
 	findModelByUserId,
-	getModelDetails,
 	getModelsByProjectType,
 	getParamsByModelId,
 } from '@/service/model.js';
@@ -513,444 +520,322 @@ import {
 	updateProjectTypeOfProject,
 	updateTestSetOfProject,
 } from '@/service/project.js';
-import TestIcon from '@/assets/icon/TestIcon.vue';
+import { getTagDetail } from '@/service/tag.js';
 import {
 	addHyparaOfProject,
 	findHyparaByPath,
-	findPathByProjectId,
+	getHyparaByProjectId,
 } from '@/service/hypara.js';
 import { getUser } from '@/service/user.js';
-import MarkdownIt from 'markdown-it';
-import { getLocal } from '@/utils/local.js';
 
-export default {
-	name: 'ProjectConfig',
-	components: {
-		TestIcon,
-		CreateDialog,
-		DeleteIcon,
-		DatasetIcon,
-		TickIcon,
-		PreviousStepIcon,
-		BackIcon,
-	},
-	data() {
-		return {
-			userId: '',
-			projectId: '',
-			showDatasetDialog: false, // 控制对话框显示
-			showAddDatasetDialog: false,
-			showDeleteSelectedDataset: false,
-			saveDialog: false,
-			selectedDatasetForDelete: '',
-			markdownEditor: new MarkdownIt(),
-			steps: [
-				{
-					number: 1,
-					label: '选择产线',
-				},
-				{
-					number: 2,
-					label: '数据准备',
-				},
-				{
-					number: 3,
-					label: '参数准备',
-				},
-				{
-					number: 4,
-					label: '提交训练',
-				},
-			],
-			currentStep: 1,
-			projectTypes: [
-				'多模态模型',
-				'基础模型',
-				'产业方案',
-				'创意工坊',
-				'视觉检测跟踪',
-				'光学字符识别',
-				'视觉分类',
-				'视觉分割',
-				'视觉编辑',
-				'三维视觉',
-				'生成式',
-				'文本编辑',
-				'生成文本',
-				'词语切分',
-				'摘要',
-				'翻译',
-				'文本分析',
-				'文本理解',
-				'文本对话',
-				'识别',
-				'合成',
-				'声音克隆',
-				'时间戳预测',
-				'语音处理',
-				'因感度计算',
-				'图像描述',
-				'视觉定位',
-				'多模态表征',
-				'蛋白质结构预测',
-				'时序预测',
-			],
-			projectTypeForChange: '',
-			changeProjectTypeDialog: false,
-			models: [],
-			personalModels: [],
-			datasetTab: 'personal',
-			publicDatasets: [],
-			personalDatasets: [],
-			displayedDataset: [],
-			vipLevel: '',
-			datasetSelected: [],
-			datasetSelectedCount: 0,
-			hyperparameters: {
-				// "learning_rate": "学习率，控制每次更新的步长",
-				// "batch_size": "每次训练使用的样本数量",
-				// "epoch": "训练的轮数"
-			},
-			form: {
-				ProjectType: '',
-				model: null, // 用于绑定选择的模型
-				dataset: [],
-				testSet: null,
-				trainSet: null,
-				params: {},
-			},
-			rules: {
-				model: [
-					{
-						required: true,
-						message: '模型选择不能为空',
-						trigger: ['blur', 'change'],
-					},
-				],
-				dataset: [
-					{
-						required: true,
-						message: '数据集不能为空',
-						trigger: ['blur', 'change'],
-					},
-				],
-			},
-		};
-	},
-	async mounted() {
-		console.log(`output->mounted`);
-		this.userId = getLocal('userId');
-		await getUser({ UserId: this.userId }).then((res) => {
-			this.vipLevel = res.data.level;
-		});
-		await findModelByUserId(this.userId).then((res) => {
-			this.personalModels = res.data;
-		});
-		if (this.$route.params.id) {
-			this.projectId = Number(this.$route.params.id);
-			await getProject({ ProjectId: this.projectId }).then(
-				async (res) => {
-					if (res != null) {
-						let data = res.data;
-						if (data.projectType) {
-							this.form.ProjectType = data.projectType;
-							getModelsByProjectType(data.projectType).then(
-								(res) => {
-									this.models = res.data;
-								},
-							);
-							this.currentStep = 1;
-						}
-						if (data.modelId !== -1) {
-							await findModelById(data.modelId).then((model) => {
-								this.form.model = model.data;
-							});
-							await getParamsByModelId(
-								this.form.model.modelId,
-							).then((param) => {
-								this.hyperparameters = param.data;
-							});
-							this.currentStep = 2;
-						}
+const route = useRoute();
+const router = useRouter();
 
-						if (data.train_DatasetId !== -1) {
-							await findDatasetById({
-								DatasetId: Number(data.train_DatasetId),
-							}).then((dataset) => {
-								if (dataset.data !== null) {
-									this.form.dataset.push(dataset.data);
-									dataset.data.selected = true;
-									this.datasetSelectedCount++;
-									this.form.trainSet = dataset.data;
-									this.currentStep = 2;
-								}
-							});
-						}
+const userId = ref(getLocal('userId'));
+const projectId = ref('');
+const showDatasetDialog = ref(false);
+const showAddDatasetDialog = ref(false);
+const showDeleteSelectedDataset = ref(false);
+const saveDialog = ref(false);
+const selectedDatasetForDelete = ref('');
+const markdownEditor = new MarkdownIt();
 
-						if (data.test_DatasetId !== -1) {
-							await findDatasetById({
-								DatasetId: Number(data.test_DatasetId),
-							}).then((dataset) => {
-								if (dataset.data) {
-									this.form.dataset.push(dataset.data);
-									dataset.data.selected = true;
-									this.datasetSelectedCount++;
-									this.form.testSet = dataset.data;
-									this.currentStep = 2;
-								}
-							});
-						}
+const steps = [
+	{ number: 1, label: '选择产线' },
+	{ number: 2, label: '数据准备' },
+	{ number: 3, label: '参数准备' },
+	{ number: 4, label: '提交训练' },
+];
 
-						await findPathByProjectId({
-							ProjectId: this.projectId,
-						}).then((res) => {
-							let path = res.data[res.data.length - 1];
+const currentStep = ref(1);
+const projectTypes = [
+	'多模态模型',
+	'基础模型',
+	'产业方案',
+	'创意工坊',
+	'视觉检测跟踪',
+	'光学字符识别',
+	'视觉分类',
+	'视觉分割',
+	'视觉编辑',
+	'三维视觉',
+	'生成式',
+	'文本编辑',
+	'生成文本',
+	'词语切分',
+	'摘要',
+	'翻译',
+	'文本分析',
+	'文本理解',
+	'文本对话',
+	'识别',
+	'合成',
+	'声音克隆',
+	'时间戳预测',
+	'语音处理',
+	'因感度计算',
+	'图像描述',
+	'视觉定位',
+	'多模态表征',
+	'蛋白质结构预测',
+	'时序预测',
+];
+const projectTypeForChange = ref('');
+const changeProjectTypeDialog = ref(false);
+const models = ref([]);
+const personalModels = ref([]);
+const datasetTab = ref('personal');
+const publicDatasets = ref([]);
+const personalDatasets = ref([]);
+const displayedDataset = ref([]);
+const vipLevel = ref('');
+const datasetSelectedCount = ref(0);
 
-							if (path) {
-								findHyparaByPath({ StorePath: path }).then(
-									(params) => {
-										this.form.params = params.data;
-									},
-								);
-								this.currentStep = 3;
-							}
-						});
-					}
-				},
-			);
-		}
+const form = reactive({
+	ProjectType: '',
+	model: null,
+	dataset: [],
+	testSet: null,
+	trainSet: null,
+	params: {},
+});
 
-		await findDatasetbyUserid({ UserId: this.userId }).then((res) => {
-			console.log(`output->DatasetbyUserid`, res);
-			this.personalDatasets = res.data;
-			this.displayedDataset = this.personalDatasets;
-		});
-		await getAllPublicDataset().then((res) => {
-			console.log(`output->publicDatasets`, res);
-			this.publicDatasets = res.data;
-		});
-		await this.initSelected();
-	},
-	methods: {
-		goBack() {
-			this.$router.push('/project');
-		},
-		goPay() {
-			this.$notify({ message: '555' });
-		},
-		previousStep() {
-			if (this.currentStep > 1) {
-				this.currentStep--;
-			}
-		},
-		// 获取标签详情
-		getTagDetail(tagName) {
-			const params = {
-				tagName: tagName,
-			};
-			getModelDetails(params)
-				.then((res) => {
-					return res.data.description;
-				})
-				.catch((err) => {
-					console.log(err);
-				});
-			return '暂无详细描述';
-		},
-		nextStep() {
-			if (this.currentStep === 1) {
-				if (!this.form.ProjectType) {
-					this.$notify({ message: '请选择任务', type: 'warning' });
-					return;
-				}
-				getModelsByProjectType(this.form.ProjectType).then((res) => {
-					this.models = res.data;
-				});
-				this.currentStep++;
-				return;
-			}
-			if (this.currentStep === 2) {
-				if (!this.form.model) {
-					this.$notify({
-						message: '请选择您的模型',
-						type: 'warning',
-					});
-					return;
-				}
-				if (this.form.dataset.length !== 2) {
-					this.$notify({
-						message: '请添加您的数据集',
-						type: 'warning',
-					});
-					return;
-				}
-				if (!this.form.testSet) {
-					this.$notify({
-						message: '请选择您的测试集',
-						type: 'warning',
-					});
-					return;
-				}
-				getParamsByModelId(this.form.model.modelId).then((res) => {
-					this.hyperparameters = res.data;
-				});
-				this.form.params = {};
-				this.currentStep++;
-				return;
-			}
-			if (this.currentStep === 3) {
-				this.currentStep++;
-				return;
-			}
-			if (this.currentStep === 4) {
-				this.saveDialog = true;
-			}
-		},
-		chooseProjectType(item) {
-			this.projectTypeForChange = item;
-			if (this.form.ProjectType !== item) {
-				this.changeProjectTypeDialog = true;
-			}
-		},
-		changeProjectType() {
-			this.form.model = null;
-			this.form.dataset = [];
-			this.form.testSet = {};
-			this.form.params = {};
-			this.form.ProjectType = this.projectTypeForChange;
-			this.projectTypeForChange = '';
-			this.clearSelected();
-			this.changeProjectTypeDialog = false;
-		},
-		cancelSelect() {
-			this.showDatasetDialog = false;
-			this.showAddDatasetDialog = false;
-		},
-		handleSelect() {
-			this.form.dataset = [];
-			this.form.trainSet = null;
-			this.form.testSet = null;
-			for (let i = 0; i < this.personalDatasets.length; i++) {
-				if (
-					this.personalDatasets[i].selected &&
-					!this.form.dataset.includes(this.personalDatasets[i])
-				) {
-					this.form.dataset.push(this.personalDatasets[i]);
-				}
-			}
-			for (let i = 0; i < this.publicDatasets.length; i++) {
-				if (
-					this.publicDatasets[i].selected &&
-					!this.form.dataset.includes(this.publicDatasets[i])
-				) {
-					this.form.dataset.push(this.publicDatasets[i]);
-				}
-			}
-			if (this.form.dataset.length > 0) {
-				this.showDatasetDialog = false;
-				this.$notify({ message: '添加成功', type: 'success' });
-			} else {
-				this.$notify({
-					message: '请至少选择一个数据集',
-					type: 'warning',
-				});
-			}
-		},
-		selectDataset(item) {
-			if (item.selected == null || item.selected === false) {
-				if (this.datasetSelectedCount >= 2) {
-					this.$notify({
-						message: '请您共选择两个数据集',
-						type: 'warning',
-					});
-				} else {
-					item.selected = true;
-					this.datasetSelectedCount++;
-				}
-			} else {
-				item.selected = false;
-				this.datasetSelectedCount--;
-			}
-		},
-		selectAsTestSet(item) {
-			this.form.testSet = item;
-			if (this.form.dataset[0].dataSetId === item.dataSetId) {
-				this.form.trainSet = this.form.dataset[1];
-			} else {
-				this.form.trainSet = this.form.dataset[0];
-			}
-		},
-		initSelected() {
-			for (let i = 0; i < this.personalDatasets.length; i++) {
-				let dataset = this.personalDatasets[i];
-				dataset.selected =
-					this.form.dataset[0].dataSetId === dataset.dataSetId ||
-					this.form.dataset[1].dataSetId === dataset.dataSetId;
-			}
-			for (let i = 0; i < this.publicDatasets.length; i++) {
-				let dataset = this.publicDatasets[i];
-				dataset.selected =
-					this.form.dataset[0].dataSetId === dataset.dataSetId ||
-					this.form.dataset[1].dataSetId === dataset.dataSetId;
-			}
-		},
-		clearSelected() {
-			for (let i = 0; i < this.personalDatasets.length; i++) {
-				let dataset = this.personalDatasets[i];
-				dataset.selected = false;
-			}
-			for (let i = 0; i < this.publicDatasets.length; i++) {
-				let dataset = this.publicDatasets[i];
-				dataset.selected = false;
-			}
-			this.datasetSelectedCount = 0;
-		},
-		deleteSelectedDataset() {
-			this.showDeleteSelectedDataset = false;
-			this.selectedDatasetForDelete.selected = false;
-			var index = this.form.dataset.indexOf(
-				this.selectedDatasetForDelete,
-			);
-			this.form.dataset.splice(index, 1);
-			this.datasetSelectedCount--;
-			if (this.selectedDatasetForDelete === this.form.testSet) {
-				this.form.testSet = null;
-			}
-			this.selectedDatasetForDelete = '';
-		},
-		saveConfig() {
-			updateProjectTypeOfProject({
-				ProjectId: this.projectId,
-				ProjectType: this.form.ProjectType,
-			});
+const hyperparameters = ref({});
 
-			updateModelOfProject({
-				ProjectId: this.projectId,
-				modelId: this.form.model.modelId,
-			});
-
-			updateDatasetOfProject({
-				ProjectId: this.projectId,
-				DatasetId: this.form.trainSet.dataSetId,
-			});
-
-			updateTestSetOfProject({
-				ProjectId: this.projectId,
-				DatasetId: this.form.testSet.dataSetId,
-			});
-
-			let params = this.form.params;
-			params.ProjectId = this.projectId;
-			console.log(params);
-			addHyparaOfProject(params).then((res) => {
-				console.log(res);
-			});
-
-			this.saveDialog = false;
-			this.$router.push('/project');
+const rules = {
+	model: [
+		{
+			required: true,
+			message: '模型选择不能为空',
+			trigger: ['blur', 'change'],
 		},
-	},
+	],
+	dataset: [
+		{
+			required: true,
+			message: '数据集不能为空',
+			trigger: ['blur', 'change'],
+		},
+	],
 };
+
+onMounted(async () => {
+	const resUser = await getUser({ UserId: userId.value });
+	console.log(`output->resUser`, resUser);
+	vipLevel.value = resUser.data.level;
+	const resModels = await findModelByUserId(userId.value);
+	personalModels.value = resModels.data;
+
+	if (route.params.id) {
+		projectId.value = Number(route.params.id);
+		const resProject = await getProject({ ProjectId: projectId.value });
+		if (resProject?.data) {
+			const data = resProject.data;
+			if (data.projectType) {
+				form.ProjectType = data['project_type'];
+				const res = await getModelsByProjectType(data['project_type']);
+				models.value = res.data;
+				currentStep.value = 1;
+			}
+			if (data['model_id'] !== -1) {
+				const modelRes = await findModelById(data['model_id']);
+				form.model = modelRes.data;
+				const paramRes = await getParamsByModelId(
+					form.model['model_id'],
+				);
+				hyperparameters.value = paramRes.data;
+				currentStep.value = 2;
+			}
+			console.log(`output->data`, data);
+			if (data.train_dataset_id !== -1) {
+				const dsRes = await findDatasetById({
+					DatasetId: Number(data.train_dataset_id),
+				});
+				if (dsRes.data) {
+					form.dataset.push(dsRes.data);
+					dsRes.data.selected = true;
+					datasetSelectedCount.value++;
+					form.trainSet = dsRes.data;
+					currentStep.value = 2;
+				}
+			}
+			if (data.test_dataset_id !== -1) {
+				const dsRes = await findDatasetById({
+					DatasetId: Number(data.test_dataset_id),
+				});
+				if (dsRes.data) {
+					form.dataset.push(dsRes.data);
+					dsRes.data.selected = true;
+					datasetSelectedCount.value++;
+					form.testSet = dsRes.data;
+					currentStep.value = 2;
+				}
+			}
+			const pathRes = await getHyparaByProjectId({
+				ProjectId: projectId.value,
+			});
+			let path = null;
+			if (pathRes.data.length) pathRes.data[pathRes.data.length - 1];
+			if (path) {
+				const hyRes = await findHyparaByPath({ StorePath: path });
+				form.params = hyRes.data;
+				currentStep.value = 3;
+			}
+		}
+	}
+
+	const personalDsRes = await findDatasetbyUserid({ UserId: userId.value });
+	personalDatasets.value = personalDsRes.data;
+	displayedDataset.value = personalDatasets.value;
+	const publicDsRes = await getAllPublicDataset();
+	publicDatasets.value = publicDsRes.data;
+	initSelected();
+});
+
+function goBack() {
+	router.push('/project');
+}
+function goPay() {
+	ElNotification({ message: '555' });
+}
+function previousStep() {
+	if (currentStep.value > 1) currentStep.value--;
+}
+function showTagDetail(tagName) {
+	getTagDetail({ tagName })
+		.then((res) => res.data.description)
+		.catch(() => '暂无详细描述');
+	return '暂无详细描述';
+}
+function nextStep() {
+	if (currentStep.value === 1) {
+		if (!form.ProjectType)
+			return ElNotification({ message: '请选择任务', type: 'warning' });
+		getModelsByProjectType(form.ProjectType).then(
+			(res) => (models.value = res.data),
+		);
+		currentStep.value++;
+	} else if (currentStep.value === 2) {
+		if (!form.model)
+			return ElNotification({
+				message: '请选择您的模型',
+				type: 'warning',
+			});
+		if (form.dataset.length !== 2)
+			return ElNotification({
+				message: '请添加您的数据集',
+				type: 'warning',
+			});
+		if (!form.testSet)
+			return ElNotification({
+				message: '请选择您的测试集',
+				type: 'warning',
+			});
+		getParamsByModelId(form.model.modelId).then(
+			(res) => (hyperparameters.value = res.data),
+		);
+		form.params = {};
+		currentStep.value++;
+	} else if (currentStep.value === 3) {
+		currentStep.value++;
+	} else if (currentStep.value === 4) {
+		saveDialog.value = true;
+	}
+}
+function chooseProjectType(item) {
+	projectTypeForChange.value = item;
+	if (form.ProjectType !== item) changeProjectTypeDialog.value = true;
+}
+function changeProjectType() {
+	form.model = null;
+	form.dataset = [];
+	form.testSet = {};
+	form.params = {};
+	form.ProjectType = projectTypeForChange.value;
+	projectTypeForChange.value = '';
+	clearSelected();
+	changeProjectTypeDialog.value = false;
+}
+function cancelSelect() {
+	showDatasetDialog.value = false;
+	showAddDatasetDialog.value = false;
+}
+function handleSelect() {
+	form.dataset = [];
+	form.trainSet = null;
+	form.testSet = null;
+	[...personalDatasets.value, ...publicDatasets.value].forEach((ds) => {
+		if (ds.selected && !form.dataset.includes(ds)) form.dataset.push(ds);
+	});
+	if (form.dataset.length > 0) {
+		showDatasetDialog.value = false;
+		ElNotification({ message: '添加成功', type: 'success' });
+	} else {
+		ElNotification({ message: '请至少选择一个数据集', type: 'warning' });
+	}
+}
+function selectDataset(item) {
+	if (!item.selected) {
+		if (datasetSelectedCount.value >= 2) {
+			ElNotification({
+				message: '请您共选择两个数据集',
+				type: 'warning',
+			});
+		} else {
+			item.selected = true;
+			datasetSelectedCount.value++;
+		}
+	} else {
+		item.selected = false;
+		datasetSelectedCount.value--;
+	}
+}
+function selectAsTestSet(item) {
+	form.testSet = item;
+	form.trainSet = form.dataset.find((d) => d.dataSetId !== item.dataSetId);
+}
+function initSelected() {
+	[...personalDatasets.value, ...publicDatasets.value].forEach((ds) => {
+		ds.selected = form.dataset.some((d) => d.dataSetId === ds.dataSetId);
+	});
+}
+function clearSelected() {
+	[...personalDatasets.value, ...publicDatasets.value].forEach(
+		(ds) => (ds.selected = false),
+	);
+	datasetSelectedCount.value = 0;
+}
+function deleteSelectedDataset() {
+	showDeleteSelectedDataset.value = false;
+	selectedDatasetForDelete.value.selected = false;
+	const index = form.dataset.indexOf(selectedDatasetForDelete.value);
+	if (index !== -1) form.dataset.splice(index, 1);
+	datasetSelectedCount.value--;
+	if (selectedDatasetForDelete.value === form.testSet) form.testSet = null;
+	selectedDatasetForDelete.value = '';
+}
+function saveConfig() {
+	updateProjectTypeOfProject({
+		ProjectId: projectId.value,
+		ProjectType: form.ProjectType,
+	});
+	updateModelOfProject({
+		ProjectId: projectId.value,
+		modelId: form.model.modelId,
+	});
+	updateDatasetOfProject({
+		ProjectId: projectId.value,
+		DatasetId: form.trainSet.dataSetId,
+	});
+	updateTestSetOfProject({
+		ProjectId: projectId.value,
+		DatasetId: form.testSet.dataSetId,
+	});
+	const params = { ...form.params, ProjectId: projectId.value };
+	addHyparaOfProject(params);
+	saveDialog.value = false;
+	router.push('/project');
+}
 </script>
 
 <style scoped>

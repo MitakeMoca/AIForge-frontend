@@ -1,7 +1,7 @@
 .project {
-  width: 100%;
+  width: 95%;
   padding-top: 60px;
-  height: 90%;
+  height: 100%;
   overflow-y: hidden;
 
   .project-top {
@@ -23,7 +23,7 @@
     justify-content: flex-start;  // 项目靠左排列
     gap: 20px;  // 项目之间设置一个间距
     margin: 40px;
-    width: 90%;
+    width: 95%;
     height: 75%;
   }
 
@@ -33,7 +33,7 @@
 
   .separator {
     margin-left: 40px;
-    width: 90%;
+    width: 95%;
     height: 1px;
     background: #D3D3D3;
   }
@@ -47,7 +47,7 @@
 
   .create-project-button {
     margin-top: 30px;
-    margin-left: 70%;
+    margin-left: 80%;
     border-radius: 7px;
     padding-top: 5px;
     cursor: pointer;

@@ -74,11 +74,6 @@ export async function getAllTagsName() {
 	return await axios.get('/Tags/name');
 }
 
-//根据模型ID获取模型详情
-export function getModelById(modelId) {
-  return axios.get(`/Model/findbymodelid/${modelId}`);
-}
-
 
 // 获取收藏模型列表
 export async function getCollectedMdels(userId) {
@@ -168,9 +163,4 @@ export function addModel(params) {
           'Content-Type': 'multipart/form-data'
       }
   });
-}
-
-// 获取模型详情
-export function getModelDetails(params) {
-  return axios.post('/Model/getTagDescrip', params);
 }

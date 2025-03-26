@@ -6,13 +6,9 @@ export function findAllDataset() {
 }
 
 export function getAllPublicDataset() {
-  return axios.get('/Dataset/findPublicDatasets')
+  return axios.get('/Dataset/public')
 }
 
-// 根据DatasetId查询数据集
-export function findDatasetbyid(params) {
-  return axios.post('/Dataset/findbydatasetid', params)
-}
 // 根据关键字模糊查询数据集
 export function findDatasetByKeyword(keyword) {
   return axios.get(`Dataset/searchPublicDatasets?keyword=${keyword}`)
@@ -24,7 +20,7 @@ export function findDatasetbyUserid(params) {
 }
 
 export function findDatasetById(id) {
-  return axios.post('/Dataset/findbydatasetid', id);
+  return axios.get(`/Dataset/${id}`, id);
 }
 
 //根据DatasetId删除对应dataset

@@ -98,7 +98,7 @@ import { ref, onMounted, computed } from 'vue';
 import { toRefs } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
-import { findDatasetbyid, findDatasetbyUserid } from '@/service/dataset';
+import { findDatasetById, findDatasetbyUserid } from '@/service/dataset';
 import Sidebar from '@/components/Sidebar.vue';
 import Upperbar from '@/components/Upperbar.vue';
 import JSZip from 'jszip';
@@ -128,7 +128,7 @@ const truncatedDescription = ref('');
 // 方法:像后端请求对应id的数据集
 const fetchDataset = async () => {
 	try {
-		const response = await findDatasetbyid({
+		const response = await findDatasetById({
 			DatasetId: idValue,
 		});
 		dataset.value = response.data;

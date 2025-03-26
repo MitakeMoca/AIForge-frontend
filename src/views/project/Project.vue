@@ -50,14 +50,6 @@
 				</span>
 			</el-dialog>
 		</div>
-		<!--    <div class="project-middle">-->
-		<!--      <span class="item" :class="{active: this.show === 'myCreate'}" @click="showMyProject()">-->
-		<!--        我的项目-->
-		<!--      </span>-->
-		<!--      <span class="item" :class="{active: this.show === 'myCollect'}" @click="showMyCollect()">-->
-		<!--        我的收藏-->
-		<!--      </span>-->
-		<!--    </div>-->
 		<div class="separator"></div>
 		<div class="project-body">
 			<router-view></router-view>
@@ -74,6 +66,7 @@ import { createProject } from '@/service/project.js';
 import CreateDialog from '@/components/CreateDialog.vue';
 import CreateIcon from '@/assets/icon/CreateIcon.vue';
 import { useRouter } from 'vue-router';
+import { ElMessage } from 'element-plus';
 
 const userId = ref('');
 const createDialog = ref(false);
@@ -125,15 +118,18 @@ function goCreate() {
 			ProjectType: '',
 		};
 		createProject(jsonData).then((res) => {
+			console.log(`output->res`, res);
 			router.push({
-				path: `/project/projectConfig/${res.data.projectId}`,
+				path: `/project/projectConfig/${res.data['project_id']}`,
 			});
 		});
 		createDialog.value = false;
+		ElMessage({
+			message: '项目创建成功',
+			type: 'success',
+		});
 	} else {
-		// 使用 Vue 3 的通知 API (假设您已使用适当的通知库)
-		// 这只是一个假设的实现，具体取决于您使用的通知库
-		this.$notify({
+		ElMessage({
 			message: '请输入合法项目名称',
 			type: 'warning',
 		});

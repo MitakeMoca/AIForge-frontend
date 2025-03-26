@@ -1,7 +1,5 @@
 import axios from '../utils/axios'
 
-//我是奶龙
-
 // 返回所有的Project列表
 export function findAllProject() {
     return axios.get('/Project/findall')
@@ -38,10 +36,9 @@ export function updateTestSetOfProject(params) {
     return axios.put('/Project/update/test_dataset', params);
 }
 
-//我不是奶龙
 //根据ProjectId, 获取project的全部内容
 export function getProject(params) {
-    return axios.post('/Project/findbyid', params)
+    return axios.get(`/Project/${params.ProjectId}`)
 }
 
 export function createDocker(params) {

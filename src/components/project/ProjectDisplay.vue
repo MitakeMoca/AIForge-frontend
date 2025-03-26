@@ -9,10 +9,15 @@
 				>
 					<!-- 顶部标题栏 -->
 					<div class="header">
-						<span class="name" @click="showConfig(item.projectId)">
-							{{ item.projectName }}
+						<span
+							class="name"
+							@click="showConfig(item['project_id'])"
+						>
+							{{ item['project_name'] }}
 						</span>
-						<span class="id">project-id: {{ item.projectId }}</span>
+						<span class="id"
+							>project-id: {{ item['project_id'] }}</span
+						>
 					</div>
 
 					<!-- 项目图片 -->
@@ -142,7 +147,7 @@ const runProject = (item) => {
 }
 
 .project-item {
-	width: calc(25% - 20px);
+	width: calc(23% - 20px);
 	display: flex;
 	flex-direction: column;
 	background: #ffffff;

@@ -1,7 +1,7 @@
 import axios from '../utils/axios'
 
-export function findPathByProjectId(params) {
-    return axios.post('/Hypara/findbyprojectid', params)
+export function getHyparaByProjectId(params) {
+    return axios.get(`/Hypara/getHyparaByProjectId/${params.ProjectId}`)
 }
 
 export function findHyparaByPath(params) {
@@ -10,10 +10,6 @@ export function findHyparaByPath(params) {
 
 export function addHyparaOfProject(params) {
     return axios.post('/Hypara/add', params);
-}
-
-export function getHyparaByProjectId(params) {
-    return axios.post('/Hypara/getbyid', params);
 }
 
 // 新增超参数信息
