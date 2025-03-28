@@ -126,7 +126,7 @@ const runProject = (item) => {
 		message: '正在启动, 请稍等',
 	});
 	setTimeout(() => {
-		router.push(`/runProject/${item.projectId}`);
+		router.push(`/runProject/${item.project_id}`);
 	}, 1000);
 };
 </script>

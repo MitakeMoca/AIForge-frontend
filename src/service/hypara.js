@@ -23,3 +23,11 @@ export function createHyparaField(params) {
 export function getHyparaByModelId(modelId) {
     return axios.get(`/Hypara/getHyparaPathByModelId/${modelId}`);
 }
+
+export function getHyparaByPath(store_path) {
+    return axios.get(`Hypara/path/${store_path}`)
+}
+
+export function getHyparasByProjectId(project_id) {
+    return axios.get(`Hypara/project/${project_id}`)
+}

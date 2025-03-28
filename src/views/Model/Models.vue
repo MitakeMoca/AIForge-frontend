@@ -321,7 +321,6 @@ const confirmDelete = (id) => {
 const handleDelete = async (id) => {
 	try {
 		const response = await deleteModel(id);
-		// console.log(response);
 
 		ElMessage({
 			title: '成功',
@@ -358,7 +357,6 @@ const confirmSetPublic = (id) => {
 const handlePublicAction = async (id) => {
 	try {
 		const response = await setWaiting({ modelId: id });
-		// console.log(response);
 
 		ElMessage({
 			title: '成功',
@@ -395,7 +393,6 @@ const confirmSetPrivate = (id) => {
 const handlePrivateAction = async (id) => {
 	try {
 		const response = await setPrivate({ modelId: id });
-		// console.log(response);
 
 		//刷新页面
 
@@ -460,7 +457,6 @@ const handleDeleteFavor = async (id) => {
 	console.log('删除 ID 为 ' + id + ' 的产线');
 	try {
 		const response = await deleteFavor(id, userId);
-		// console.log(response);
 
 		ElMessage({
 			title: '成功',
@@ -499,13 +495,8 @@ const status = '公开';
 const statusText = '公开';
 
 async function getTags(modelid) {
-	try {
-		const response = await getAllTagsByModelid(modelid);
-		return response.data;
-	} catch (err) {
-		error.value = "Failed to get model's tags";
-		console.log(error);
-	}
+	const response = await getAllTagsByModelid(modelid);
+	return response.data;
 }
 
 const getStatus = (pub) => {
@@ -522,7 +513,6 @@ const getStatus = (pub) => {
 async function fetchMyModels() {
 	try {
 		const response = await getMyModels(userId);
-		console.log(`output->response mymodels`, response);
 		const modelsWithPendingTags = response.data.map((model) => ({
 			id: model.id,
 			name: model.model_name,
@@ -556,7 +546,6 @@ async function fetchMyModels() {
 async function fetchPipelines() {
 	try {
 		const response = await getCollectedMdels(userId);
-		console.log(response.data);
 		//首先映射出所有的pipeline，并准备一个数组来存放所有的tags获取请求
 		const pipelinesWithPendingTags = response.data.map((model) => ({
 			id: model.modelId,
@@ -581,8 +570,6 @@ async function fetchPipelines() {
 			);
 			return { ...pipeline, tags: tagsResult ? tagsResult.tags : '' };
 		});
-
-		//console.log(pipelines.value);
 	} catch (err) {
 		error.value = 'Failed to load collected pipelines';
 	} finally {
@@ -646,8 +633,6 @@ function sortPipelines(order) {
 			return b.date - a.date; // 倒序
 		}
 	});
-
-	//console.log(sortedPipelines);
 
 	// 更新 pipelines.value
 	pipelines.value = sortedPipelines;

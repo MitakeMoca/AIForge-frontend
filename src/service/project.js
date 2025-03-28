@@ -54,8 +54,8 @@ export function stopDocker(params) {
 }
 
 //获取文件树
-export function getFolderTree(params) {
-    return axios.post('/Project/tree', params);
+export function getFolderTree(project_id) {
+    return axios.get(`/Project/tree/${project_id}`);
 }
 
 export function getFile(params) {

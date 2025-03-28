@@ -20,11 +20,15 @@
 		<el-aside width="30%">
 			<div class="project-filter-container">
 				<h2>项目信息</h2>
-				<p><strong>名称:</strong> {{ stata.project.projectName }}</p>
+				<p><strong>名称:</strong> {{ stata.project.project_name }}</p>
 				<p><strong>状态:</strong> {{ stata.project.status }}</p>
 				<p><strong>描述:</strong> {{ stata.project.description }}</p>
-				<p><strong>创建时间:</strong> {{ stata.project.createTime }}</p>
-				<p><strong>更改时间:</strong> {{ stata.project.updateTime }}</p>
+				<p>
+					<strong>创建时间:</strong> {{ stata.project.create_time }}
+				</p>
+				<p>
+					<strong>更改时间:</strong> {{ stata.project.update_time }}
+				</p>
 				<div class="hyperparameters">
 					<h2>更改超参</h2>
 					<el-row
@@ -173,8 +177,7 @@ import {
 } from '@/service/project';
 import {
 	findHyparaByPath,
-	getHyparaByProjectId,
-	getHyparaByProjectId,
+	getHyparasByProjectId,
 	addHyparaOfProject,
 } from '@/service/hypara';
 import { ElMessage, ElMessageBox } from 'element-plus';
@@ -263,9 +266,9 @@ onMounted(async () => {
 	//   router.push("/");
 	// }
 	await fetchData();
-	const getHyparaByProjectIdResponse = await getHyparaByProjectId({
-		ProjectId: Number(stata.project.projectId),
-	});
+	const getHyparaByProjectIdResponse = await getHyparasByProjectId(
+		Number(stata.project.project_id),
+	);
 	stata.hyperparameters = getHyparaByProjectIdResponse.data;
 	console.log(stata.hyperparameters);
 
@@ -292,6 +295,7 @@ const renderMarkdown = (content) => {
 
 const fetchData = async () => {
 	try {
+		console.log(`output->route.params`, route.params);
 		const { id } = route.params;
 		stata.project.projectId = id;
 
@@ -300,9 +304,9 @@ const fetchData = async () => {
 		});
 		stata.project = getProjectResponse.data;
 
-		const getFolderTreeResponse = await getFolderTree({
-			ProjectId: Number(stata.project.projectId),
-		});
+		const getFolderTreeResponse = await getFolderTree(
+			Number(stata.project.project_id),
+		);
 		fileData.value = getFolderTreeResponse.data;
 	} catch (error) {
 		console.error('数据获取失败:', error);
@@ -360,9 +364,9 @@ const startDocker = async (command) => {
 		}
 	}
 
-	const getHyparaByProjectIdResponse = await getHyparaByProjectId({
-		ProjectId: Number(stata.project.projectId),
-	});
+	const getHyparaByProjectIdResponse = await getHyparasByProjectId(
+		Number(stata.project.project_id),
+	);
 	console.log(getHyparaByProjectIdResponse.data);
 	console.log(getHyparaByProjectIdResponse);
 	if (
