@@ -295,16 +295,13 @@ import {
 	deleteModel,
 } from '../../service/model.js';
 import { getLocal, setLocal } from '@/utils/local';
-import { getAllModelTags } from '../../service/ModelSquare';
+import { getAllTagsName } from '@/service/tag';
 
 // 在组件挂载时调用 fetchPipelines
 onMounted(() => {
 	fetchPipelines();
 	fetchMyModels();
 	fetchAllModelTags();
-	// if (route.query.activeTab) {
-	//   activeTab.value = route.query.activeTab;
-	// }
 });
 
 const confirmDelete = (id) => {
@@ -430,12 +427,11 @@ import { ElMessageBox, ElMessage } from 'element-plus';
 const options = ref([]);
 async function fetchAllModelTags() {
 	try {
-		const response = await getAllModelTags();
-		console.log('here');
+		const response = await getAllTagsName();
 		if (response && response.resultCode === 200) {
 			// 动态生成 options，label 为返回的数据，value 从 1 开始依次递增
 			options.value = response.data.map((tag, index) => ({
-				label: tag['tag_name'], // 假设返回的数据是标签名称
+				label: tag, // 假设返回的数据是标签名称
 				value: index + 1,
 			}));
 		} else {
@@ -526,12 +522,13 @@ const getStatus = (pub) => {
 async function fetchMyModels() {
 	try {
 		const response = await getMyModels(userId);
+		console.log(`output->response mymodels`, response);
 		const modelsWithPendingTags = response.data.map((model) => ({
-			id: model.modelId,
-			name: model.modelName,
+			id: model.id,
+			name: model.model_name,
 			status: getStatus(model.pub),
 			pub: model.pub,
-			date: new Date(model.modelDate),
+			date: new Date(model.model_date),
 			tags: '', // 初始化为空
 		}));
 

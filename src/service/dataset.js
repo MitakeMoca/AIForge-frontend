@@ -20,7 +20,8 @@ export function findDatasetbyUserid(params) {
 }
 
 export function findDatasetById(id) {
-  return axios.get(`/Dataset/${id}`, id);
+  console.log(`output->dataset_id`,id)
+  return axios.get(`/Dataset/${id}`);
 }
 
 //根据DatasetId删除对应dataset

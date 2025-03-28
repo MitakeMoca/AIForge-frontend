@@ -6,13 +6,11 @@
 					class="project-item"
 					v-for="(item, index) in projectList"
 					:key="index"
+					@click="showConfig(item['project_id'])"
 				>
 					<!-- 顶部标题栏 -->
 					<div class="header">
-						<span
-							class="name"
-							@click="showConfig(item['project_id'])"
-						>
+						<span class="name">
 							{{ item['project_name'] }}
 						</span>
 						<span class="id"
@@ -118,6 +116,7 @@ const confirmDelete = () => {
 
 // 进入项目配置页面
 const showConfig = (id) => {
+	console.log(`output->id`, id);
 	router.push(`/project/projectConfig/${id}`);
 };
 

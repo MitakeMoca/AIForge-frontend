@@ -633,7 +633,8 @@ onMounted(async () => {
 		const resProject = await getProject({ ProjectId: projectId.value });
 		if (resProject?.data) {
 			const data = resProject.data;
-			if (data.projectType) {
+			console.log(`output->data`, data);
+			if (data.project_type) {
 				form.value.ProjectType = data['project_type'];
 				const res = await getModelsByProjectType(data['project_type']);
 				models.value = res.data;
@@ -641,6 +642,7 @@ onMounted(async () => {
 			}
 			if (data['model_id'] !== -1) {
 				const modelRes = await findModelById(data['model_id']);
+				console.log(`output->modelRes`, modelRes);
 				form.value.model = modelRes.data;
 				const paramRes = await getHyparaByModelId(form.value.model.id);
 				hyperparameters.value = paramRes.data;
@@ -648,9 +650,7 @@ onMounted(async () => {
 			}
 			console.log(`output->data`, data);
 			if (data.train_dataset_id !== -1) {
-				const dsRes = await findDatasetById({
-					DatasetId: Number(data.train_dataset_id),
-				});
+				const dsRes = await findDatasetById(data.train_dataset_id);
 				if (dsRes.data) {
 					form.value.dataset.push(dsRes.data);
 					dsRes.data.selected = true;
@@ -660,11 +660,9 @@ onMounted(async () => {
 				}
 			}
 			if (data.test_dataset_id !== -1) {
-				const dsRes = await findDatasetById({
-					DatasetId: Number(data.test_dataset_id),
-				});
+				const dsRes = await findDatasetById(data.test_dataset_id);
 				if (dsRes.data) {
-					form.dataset.push(dsRes.data);
+					form.value.dataset.push(dsRes.data);
 					dsRes.data.selected = true;
 					datasetSelectedCount.value++;
 					form.testSet = dsRes.data;

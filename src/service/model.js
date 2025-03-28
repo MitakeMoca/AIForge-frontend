@@ -60,7 +60,7 @@ export function getAllBasicModels(params) {
 
 export async function getAllTagsByModelid(modelId) {
   try{
-    const response = await axios.get(`/Model/findTagsByModelId/${modelId}`);
+    const response = await axios.get(`/Model/tags/${modelId}`);
     return response;
 
   }catch(error)
@@ -70,15 +70,10 @@ export async function getAllTagsByModelid(modelId) {
   }
 }
 
-export async function getAllTagsName() {
-	return await axios.get('/Tags/name');
-}
-
-
 // 获取收藏模型列表
 export async function getCollectedMdels(userId) {
   try {
-        const response = await axios.get(`/favors/getFavoredModelsByUserId/${userId}`);
+        const response = await axios.get(`/Favors/getFavoredModelsByUserId/${userId}`);
         return response;
     } catch (error) {
         console.error("Error fetching model details:", error);
@@ -117,7 +112,7 @@ export async function deleteFavor(modelId, userId) {
 
   try
   {
-    return axios.delete(`/favors/deleteFavor/${modelId}/${userId}`)
+    return axios.delete(`/Favors/deleteFavor/${modelId}/${userId}`)
   }catch (error) {
         console.error("Error fetching model details:", error);
         throw error;

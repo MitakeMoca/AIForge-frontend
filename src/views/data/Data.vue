@@ -128,9 +128,7 @@ const truncatedDescription = ref('');
 // 方法:像后端请求对应id的数据集
 const fetchDataset = async () => {
 	try {
-		const response = await findDatasetById({
-			DatasetId: idValue,
-		});
+		const response = await findDatasetById(idValue);
 		dataset.value = response.data;
 		truncatedDescription.value = computed(() => {
 			if (dataset.introduction) {

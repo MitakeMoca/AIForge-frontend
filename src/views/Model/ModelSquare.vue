@@ -265,7 +265,7 @@ import ModelCard from '@/components/model/ModelCard.vue';
 import sidebar from '../../components/Sidebar.vue';
 import upperbar from '../../components/Upperbar.vue';
 import { getAllModelSummaries } from '../../service/ModelSquare';
-import { getAllTagsName } from '@/service/model';
+import { getAllTagsName } from '@/service/tag';
 import { getLocal, setLocal } from '@/utils/local';
 
 // 定义响应式变量
