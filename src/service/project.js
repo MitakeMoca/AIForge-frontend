@@ -41,8 +41,8 @@ export function getProject(params) {
     return axios.get(`/Project/${params.ProjectId}`)
 }
 
-export function createDocker(params) {
-    return axios.put('/Project/create', params);
+export function createDocker(project_id) {
+    return axios.put(`/Project/Docker/${project_id}`);
 }
 
 export function runDocker(params) {

@@ -295,7 +295,6 @@ const renderMarkdown = (content) => {
 
 const fetchData = async () => {
 	try {
-		console.log(`output->route.params`, route.params);
 		const { id } = route.params;
 		stata.project.projectId = id;
 
@@ -340,9 +339,9 @@ const startDocker = async (command) => {
 
 	activeTab.value = 'logs';
 	if (stata.project.status == 'init' || stata.project.status == 'stopped') {
-		const createDockerResponse = await createDocker({
-			ProjectId: Number(stata.project.projectId),
-		});
+		const createDockerResponse = await createDocker(
+			Number(stata.project.projectId),
+		);
 		if (
 			createDockerResponse.resultCode != 200 &&
 			['403'].includes(createDockerResponse.data)
@@ -367,7 +366,6 @@ const startDocker = async (command) => {
 	const getHyparaByProjectIdResponse = await getHyparasByProjectId(
 		Number(stata.project.project_id),
 	);
-	console.log(getHyparaByProjectIdResponse.data);
 	console.log(getHyparaByProjectIdResponse);
 	if (
 		getHyparaByProjectIdResponse.data == null ||
