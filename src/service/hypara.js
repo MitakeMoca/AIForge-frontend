@@ -4,8 +4,8 @@ export function getHyparaByProjectId(params) {
     return axios.get(`/Hypara/getHyparaByProjectId/${params.ProjectId}`)
 }
 
-export function findHyparaByPath(params) {
-    return axios.post('/Hypara/getbypath', params)
+export function findHyparaByPath(store_path) {
+    return axios.get(`/Hypara/path/${store_path}`)
 }
 
 export function addHyparaOfProject(params) {

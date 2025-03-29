@@ -46,7 +46,7 @@ export function createDocker(project_id) {
 }
 
 export function runDocker(params) {
-    return axios.put('/Project/run', params);
+    return axios.post('/Project/run', params);
 }
 
 export function stopDocker(params) {

@@ -340,7 +340,7 @@ const startDocker = async (command) => {
 	activeTab.value = 'logs';
 	if (stata.project.status == 'init' || stata.project.status == 'stopped') {
 		const createDockerResponse = await createDocker(
-			Number(stata.project.projectId),
+			Number(stata.project.project_id),
 		);
 		if (
 			createDockerResponse.resultCode != 200 &&
@@ -352,10 +352,10 @@ const startDocker = async (command) => {
 	} else if (stata.project.status == 'running') {
 		// 一般情况下不会出现，出现的时候需要先暂停运行
 		const stopDockerResponse = await stopDocker({
-			ProjectId: Number(stata.project.projectId),
+			ProjectId: Number(stata.project.project_id),
 		});
 		const createDockerResponse = await createDocker({
-			ProjectId: Number(stata.project.projectId),
+			ProjectId: Number(stata.project.project_id),
 		});
 		if (createDockerResponse.resultCode != 200) {
 			ElMessage.error('启动失败, 请重试');
@@ -375,9 +375,7 @@ const startDocker = async (command) => {
 		return;
 	}
 
-	const findHyparaByPathResponse = await findHyparaByPath({
-		StorePath: getHyparaByProjectIdResponse.data[0],
-	});
+	const findHyparaByPathResponse = getHyparaByProjectIdResponse;
 	if (
 		findHyparaByPathResponse.data == null ||
 		findHyparaByPathResponse.data == {}
@@ -387,7 +385,7 @@ const startDocker = async (command) => {
 	}
 
 	const runDockerResponse = await runDocker({
-		ProjectId: Number(stata.project.projectId),
+		project_id: Number(stata.project.project_id),
 		Command: command + '.py',
 		Hypara: findHyparaByPathResponse.data,
 	});
@@ -510,7 +508,7 @@ const subscribeToChat = () => {
 const sendMessage = async () => {
 	if (stata.project.status == 'init' || stata.project.status == 'stopped') {
 		const createDockerResponse = await createDocker({
-			ProjectId: Number(stata.project.projectId),
+			ProjectId: Number(stata.project.project_id),
 		});
 		if (
 			createDockerResponse.resultCode != 200 &&
