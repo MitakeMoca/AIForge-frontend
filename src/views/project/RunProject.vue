@@ -335,7 +335,7 @@ const startDocker = async (command) => {
 	}
 	isTrain = true;
 	console.log('command: ' + command);
-	console.log('id: ' + stata);
+	console.log('id: ' + stata.project.status);
 
 	activeTab.value = 'logs';
 	if (stata.project.status == 'init' || stata.project.status == 'stopped') {
@@ -386,8 +386,8 @@ const startDocker = async (command) => {
 
 	const runDockerResponse = await runDocker({
 		project_id: Number(stata.project.project_id),
-		Command: command + '.py',
-		Hypara: findHyparaByPathResponse.data,
+		command: command + '.py',
+		hypara: findHyparaByPathResponse.data,
 	});
 	console.log(runDockerResponse);
 	if (runDockerResponse.resultCode == 200) {
@@ -477,7 +477,7 @@ const connectWebSocket = () => {
 // 订阅项目日志通道
 const subscribeToLogs = () => {
 	stompClient.subscribe(
-		`/topic/logs/project_${stata.project.projectId}`,
+		`/topic/logs/project_${stata.project.project_id}`,
 		(message) => {
 			const newLog = JSON.parse(message.body);
 			logs.value.push({
@@ -491,7 +491,7 @@ const subscribeToLogs = () => {
 // 订阅项目聊天通道
 const subscribeToChat = () => {
 	stompClient.subscribe(
-		`/topic/chat/project_${stata.project.projectId}`,
+		`/topic/chat/project_${stata.project.project_id}`,
 		(message) => {
 			const response = JSON.parse(message.body);
 			console.log(response.message);
@@ -527,9 +527,9 @@ const sendMessage = async () => {
 	}
 	if (userInput.value.trim()) {
 		const runDockerResponse = await runDocker({
-			ProjectId: Number(stata.project.projectId),
-			Command: 'predict.py',
-			Hypara: { message: userInput.value },
+			Project_id: Number(stata.project.projectId),
+			command: 'predict.py',
+			hypara: { message: userInput.value },
 		});
 		console.log(runDockerResponse);
 

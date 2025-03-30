@@ -42,7 +42,7 @@ export function getProject(params) {
 }
 
 export function createDocker(project_id) {
-    return axios.put(`/Project/Docker/${project_id}`);
+    return axios.post(`/Project/Docker/${project_id}`);
 }
 
 export function runDocker(params) {
@@ -50,7 +50,7 @@ export function runDocker(params) {
 }
 
 export function stopDocker(params) {
-    return axios.put('/Project/stop', params);
+    return axios.post('/Project/stop', params);
 }
 
 //获取文件树
