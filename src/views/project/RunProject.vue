@@ -192,6 +192,7 @@ import axios from 'axios'; // 用于请求文件内容
 import MarkdownIt from 'markdown-it';
 import texmath from 'markdown-it-texmath';
 import katex from 'katex';
+import { Client } from '@stomp/stompjs';
 
 const md = new MarkdownIt({
 	html: true, // 启用 HTML 标签解析
@@ -297,9 +298,8 @@ const fetchData = async () => {
 	try {
 		const { id } = route.params;
 		stata.project.projectId = id;
-
 		const getProjectResponse = await getProject({
-			ProjectId: Number(stata.project.projectId),
+			ProjectId: Number(stata.project.project_id),
 		});
 		stata.project = getProjectResponse.data;
 
@@ -338,7 +338,11 @@ const startDocker = async (command) => {
 	console.log('id: ' + stata.project.status);
 
 	activeTab.value = 'logs';
-	if (stata.project.status == 'init' || stata.project.status == 'stopped') {
+	if (
+		stata.project.status == 'init' ||
+		stata.project.status == 'stopped' ||
+		stata.project.status == 'finished'
+	) {
 		const createDockerResponse = await createDocker(
 			Number(stata.project.project_id),
 		);
@@ -351,9 +355,9 @@ const startDocker = async (command) => {
 		}
 	} else if (stata.project.status == 'running') {
 		// 一般情况下不会出现，出现的时候需要先暂停运行
-		const stopDockerResponse = await stopDocker({
-			ProjectId: Number(stata.project.project_id),
-		});
+		const stopDockerResponse = await stopDocker(
+			Number(stata.project.project_id),
+		);
 		const createDockerResponse = await createDocker({
 			ProjectId: Number(stata.project.project_id),
 		});
@@ -412,9 +416,9 @@ const exitDocker = async () => {
 		stata.project.status == 'running'
 	) {
 		ElMessage.success('正在关闭环境, 这可能需要一段时间...');
-		const stopDockerResponse = await stopDocker({
-			ProjectId: Number(stata.project.projectId),
-		});
+		const stopDockerResponse = await stopDocker(
+			Number(stata.project.projectId),
+		);
 		if (stopDockerResponse.resultCode != 200) {
 			ElMessage.error('停止失败');
 		}
@@ -460,48 +464,79 @@ const deriveModel = async () => {
 	}
 };
 
-// WebSocket 连接设置
 const connectWebSocket = () => {
-	const socketUrl = `http://localhost:8084/ws`;
-	const socket = new SockJS(socketUrl);
-	stompClient = Stomp.over(socket);
+	const socketUrl = 'ws://localhost:8084/ws'; // 用 WebSocket 协议
+	const socket = new WebSocket(socketUrl);
 
-	stompClient.connect({}, (frame) => {
-		console.log('Connected to WebSocket:', frame);
-		isConnected = true; // 设置为已连接
-		subscribeToLogs(); // 连接成功后订阅日志通道
-		subscribeToChat(); // 连接成功后订阅聊天通道
+	// WebSocket 连接成功时的回调
+	socket.onopen = () => {
+		console.log('Connected to WebSocket');
+		socket.send(JSON.stringify({ message: 'Hello from frontend' }));
+		// 发送订阅请求或初始化操作
+		subscribeToLogs(socket);
+		subscribeToChat(socket);
+	};
+
+	// WebSocket 收到消息时的回调
+	socket.onmessage = (event) => {
+		console.log('Message from server:', event.data);
+		const message = JSON.parse(event.data);
+		if (message.type === 'log') {
+			handleLogMessage(message);
+		} else if (message.type === 'chat') {
+			handleChatMessage(message);
+		}
+	};
+
+	// WebSocket 连接关闭时的回调
+	socket.onclose = () => {
+		console.log('WebSocket connection closed');
+	};
+
+	// WebSocket 发生错误时的回调
+	socket.onerror = (error) => {
+		console.log('WebSocket error occurred:', error);
+		console.log('Error message:', error.message); // 查看详细错误消息
+		console.log('Error stack:', error.stack); // 查看错误的调用栈
+	};
+};
+
+// 订阅日志消息
+const subscribeToLogs = (socket) => {
+	const message = JSON.stringify({
+		action: 'subscribe',
+		channel: `/topic/logs/project_${stata.project.project_id}`,
+	});
+	socket.send(message); // 发送订阅请求
+};
+
+// 订阅聊天消息
+const subscribeToChat = (socket) => {
+	const message = JSON.stringify({
+		action: 'subscribe',
+		channel: `/topic/chat/project_${stata.project.project_id}`,
+	});
+	socket.send(message); // 发送订阅请求
+};
+
+// 处理日志消息
+const handleLogMessage = (message) => {
+	const newLog = message.body;
+	logs.value.push({
+		id: logs.value.length + 1,
+		message: newLog.message,
 	});
 };
 
-// 订阅项目日志通道
-const subscribeToLogs = () => {
-	stompClient.subscribe(
-		`/topic/logs/project_${stata.project.project_id}`,
-		(message) => {
-			const newLog = JSON.parse(message.body);
-			logs.value.push({
-				id: logs.value.length + 1,
-				message: newLog.message,
-			});
-		},
-	);
-};
-
-// 订阅项目聊天通道
-const subscribeToChat = () => {
-	stompClient.subscribe(
-		`/topic/chat/project_${stata.project.project_id}`,
-		(message) => {
-			const response = JSON.parse(message.body);
-			console.log(response.message);
-			messages.value.push({
-				id: Date.now(),
-				type: 'text',
-				content: response.message,
-			});
-		},
-	);
+// 处理聊天消息
+const handleChatMessage = (message) => {
+	const response = message.body;
+	console.log(response.message);
+	messages.value.push({
+		id: Date.now(),
+		type: 'text',
+		content: response.message,
+	});
 };
 
 // 发送消息

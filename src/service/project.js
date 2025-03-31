@@ -49,8 +49,8 @@ export function runDocker(params) {
     return axios.post('/Project/run', params);
 }
 
-export function stopDocker(params) {
-    return axios.post('/Project/stop', params);
+export function stopDocker(project_id) {
+    return axios.post(`/Project/stop/${project_id}`);
 }
 
 //获取文件树
