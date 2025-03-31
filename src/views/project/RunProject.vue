@@ -281,6 +281,7 @@ onMounted(async () => {
 	link.rel = 'stylesheet';
 	link.href = 'https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.css';
 	document.head.appendChild(link);
+	connectWebSocket();
 });
 
 onUnmounted(async () => {
@@ -299,7 +300,7 @@ const fetchData = async () => {
 		const { id } = route.params;
 		stata.project.projectId = id;
 		const getProjectResponse = await getProject({
-			ProjectId: Number(stata.project.project_id),
+			ProjectId: Number(stata.project.projectId),
 		});
 		stata.project = getProjectResponse.data;
 
@@ -341,7 +342,8 @@ const startDocker = async (command) => {
 	if (
 		stata.project.status == 'init' ||
 		stata.project.status == 'stopped' ||
-		stata.project.status == 'finished'
+		stata.project.status == 'finished' ||
+		stata.project.status == 'wait'
 	) {
 		const createDockerResponse = await createDocker(
 			Number(stata.project.project_id),
@@ -356,11 +358,11 @@ const startDocker = async (command) => {
 	} else if (stata.project.status == 'running') {
 		// 一般情况下不会出现，出现的时候需要先暂停运行
 		const stopDockerResponse = await stopDocker(
+			Number(stata.project.projectId),
+		);
+		const createDockerResponse = await createDocker(
 			Number(stata.project.project_id),
 		);
-		const createDockerResponse = await createDocker({
-			ProjectId: Number(stata.project.project_id),
-		});
 		if (createDockerResponse.resultCode != 200) {
 			ElMessage.error('启动失败, 请重试');
 			return;
@@ -388,6 +390,15 @@ const startDocker = async (command) => {
 		return;
 	}
 
+	console.log(`output->`, {
+		project_id: Number(stata.project.project_id),
+		command: command + '.py',
+		hypara: findHyparaByPathResponse.data,
+	});
+	if (!isConnected) {
+		console.log('WebSocket 未连接，正在尝试连接...');
+		connectWebSocket();
+	}
 	const runDockerResponse = await runDocker({
 		project_id: Number(stata.project.project_id),
 		command: command + '.py',
@@ -402,10 +413,6 @@ const startDocker = async (command) => {
 	}
 	await fetchData();
 
-	if (!isConnected) {
-		console.log('WebSocket 未连接，正在尝试连接...');
-		connectWebSocket(); // 尝试连接 WebSocket
-	}
 	isTrain = false;
 };
 
@@ -470,6 +477,7 @@ const connectWebSocket = () => {
 
 	// WebSocket 连接成功时的回调
 	socket.onopen = () => {
+		isConnected = true;
 		console.log('Connected to WebSocket');
 		socket.send(JSON.stringify({ message: 'Hello from frontend' }));
 		// 发送订阅请求或初始化操作
@@ -519,18 +527,23 @@ const subscribeToChat = (socket) => {
 	socket.send(message); // 发送订阅请求
 };
 
+let logsSet = new Set();
 // 处理日志消息
 const handleLogMessage = (message) => {
-	const newLog = message.body;
+	console.log(`output->messgea`, message);
+	const newLog = message;
+	if (logsSet.has(newLog.message_id)) return;
 	logs.value.push({
 		id: logs.value.length + 1,
 		message: newLog.message,
 	});
+	logsSet.add(newLog.message_id);
+	console.log(`output->logs`, logs);
 };
 
 // 处理聊天消息
 const handleChatMessage = (message) => {
-	const response = message.body;
+	const response = message;
 	console.log(response.message);
 	messages.value.push({
 		id: Date.now(),
@@ -542,9 +555,9 @@ const handleChatMessage = (message) => {
 // 发送消息
 const sendMessage = async () => {
 	if (stata.project.status == 'init' || stata.project.status == 'stopped') {
-		const createDockerResponse = await createDocker({
-			ProjectId: Number(stata.project.project_id),
-		});
+		const createDockerResponse = await createDocker(
+			Number(stata.project.project_id),
+		);
 		if (
 			createDockerResponse.resultCode != 200 &&
 			['403'].includes(createDockerResponse.data)
