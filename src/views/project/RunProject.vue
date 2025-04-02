@@ -273,38 +273,6 @@ onMounted(async () => {
 	link.rel = 'stylesheet';
 	link.href = 'https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.css';
 	document.head.appendChild(link);
-	const currentDate = new Date();
-	const formattedTime = currentDate.toLocaleTimeString();
-	handleLogMessage({
-		message_id: 1,
-		timestamp: formattedTime,
-		message: 'accuracy: 0.02',
-		entry: 'system',
-	});
-	handleLogMessage({
-		message_id: 2,
-		timestamp: formattedTime,
-		message: 'accuracy: 0.03',
-		entry: 'info',
-	});
-	handleLogMessage({
-		message_id: 3,
-		timestamp: formattedTime,
-		message: 'accuracy: 0.03',
-		entry: 'error',
-	});
-	handleLogMessage({
-		message_id: 4,
-		timestamp: formattedTime,
-		message: 'accuracy: 0.03',
-		entry: 'warning',
-	});
-	handleLogMessage({
-		message_id: 5,
-		timestamp: formattedTime,
-		message: 'accuracy: 0.03',
-		entry: 'info',
-	});
 	connectWebSocket();
 });
 
@@ -423,10 +391,24 @@ const startDocker = async (command) => {
 		console.log('WebSocket 未连接，正在尝试连接...');
 		connectWebSocket();
 	}
+	const currentDate = new Date();
+	const formattedTime = currentDate.toLocaleTimeString();
+	handleLogMessage({
+		message_id: 1,
+		timestamp: formattedTime,
+		message: '模型开始训练',
+		entry: 'system',
+	});
 	const runDockerResponse = await runDocker({
 		project_id: Number(stata.project.project_id),
 		command: command + '.py',
 		hypara: findHyparaByPathResponse.data,
+	});
+	handleLogMessage({
+		message_id: 2,
+		timestamp: formattedTime,
+		message: '模型训练完成',
+		entry: 'system',
 	});
 	console.log(runDockerResponse);
 	if (runDockerResponse.resultCode == 200) {
@@ -557,9 +539,11 @@ const handleLogMessage = (message) => {
 	console.log(`output->messgea`, message);
 	const newLog = message;
 	if (logsSet.has(newLog.message_id)) return;
+	const currentDate = new Date();
+	const formattedTime = currentDate.toLocaleTimeString();
 	logs.value.push({
 		id: logs.value.length + 1,
-		timestamp: newLog.timestamp,
+		timestamp: formattedTime,
 		message: newLog.message,
 		entry: newLog.entry,
 	});

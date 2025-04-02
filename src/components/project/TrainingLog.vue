@@ -7,7 +7,7 @@
 			:key="log.id"
 			:class="['log-entry', log.entry]"
 		>
-			<span class="log-type">[{{ log.entry }}]</span> -
+			<span class="log-type">[{{ log.entry.toUpperCase() }}]</span>
 			<span class="log-timestamp">{{ log.timestamp }}</span>
 			<span class="log-message">{{ log.message }}</span>
 		</div>
@@ -44,7 +44,7 @@ defineProps({
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 	display: flex;
 	align-items: center;
-	font-size: 14px;
+	font-size: 18px;
 	font-weight: bold;
 }
 
@@ -53,11 +53,10 @@ defineProps({
 }
 
 .log-type {
-	font-size: 14px;
+	font-size: 18px;
 	font-weight: bold;
 	padding: 2px 8px;
 	border-radius: 4px;
-	margin-right: 8px;
 }
 
 .log-timestamp {
@@ -65,7 +64,7 @@ defineProps({
 }
 
 .log-message {
-	font-size: 14px;
+	font-size: 18px;
 	line-height: 1.5;
 }
 
