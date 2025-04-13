@@ -456,9 +456,9 @@ const deriveModel = async () => {
 
 		// 如果用户点击 "确定"
 		if (confirm) {
-			const project2modelResponse = await project2model({
-				ProjectId: Number(stata.project.projectId),
-			});
+			const project2modelResponse = await project2model(
+				Number(stata.project.project_id),
+			);
 
 			if (project2modelResponse.resultCode === 200) {
 				ElMessage.success('导出模型成功！');

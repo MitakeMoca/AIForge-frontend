@@ -1,4 +1,4 @@
-import axios from '../utils/axios'
+import axios from '@/utils/axios'
 
 // 返回所有的Project列表
 export function findAllProject() {
@@ -69,6 +69,6 @@ export function getPicture(params) {
     });
 }
 
-export function project2model(params) {
-    return axios.put('/Project/transfor/model', params);
+export function project2model(project_id) {
+    return axios.put(`/Project/transfor2model/${project_id}`);
 }
