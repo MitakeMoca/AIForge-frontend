@@ -19,43 +19,6 @@
 
 		<el-aside width="30%">
 			<div class="project-filter-container">
-				<h2>项目信息</h2>
-				<p><strong>名称:</strong> {{ stata.project.project_name }}</p>
-				<p><strong>状态:</strong> {{ stata.project.status }}</p>
-				<p><strong>描述:</strong> {{ stata.project.description }}</p>
-				<p>
-					<strong>创建时间:</strong> {{ stata.project.create_time }}
-				</p>
-				<p>
-					<strong>更改时间:</strong> {{ stata.project.update_time }}
-				</p>
-				<div class="hyperparameters">
-					<h2>更改超参</h2>
-					<el-row
-						v-for="(value, key) in stata.hyperparameters"
-						:key="key"
-						class="hyperparameter-item"
-					>
-						<el-col :span="8">
-							<strong>{{ key }}</strong>
-						</el-col>
-						<el-col :span="16">
-							<el-input
-								v-model="stata.hyperparameters[key]"
-								size="small"
-								placeholder="请输入值"
-							/>
-						</el-col>
-					</el-row>
-					<div class="save-button">
-						<el-button
-							type="primary"
-							@click="saveHyperparameters()"
-							style="margin-top: 10px"
-							>保存</el-button
-						>
-					</div>
-				</div>
 				<h2>项目文件</h2>
 
 				<FolderTree
@@ -75,6 +38,9 @@
 
 		<el-main>
 			<el-tabs v-model="activeTab">
+				<el-tab-pane label="基本信息" name="basic">
+					<BasicInfo :stata="stata" />
+				</el-tab-pane>
 				<el-tab-pane label="文件界面" name="files">
 					<div class="tab-content">
 						<!-- 文件展示区域 -->
@@ -167,11 +133,7 @@ import {
 	createDocker,
 	project2model,
 } from '@/service/project';
-import {
-	findHyparaByPath,
-	getHyparasByProjectId,
-	addHyparaOfProject,
-} from '@/service/hypara';
+import { findHyparaByPath, getHyparasByProjectId } from '@/service/hypara';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { getLocal } from '@/utils/local';
 import Stomp from 'stompjs';
@@ -185,6 +147,7 @@ import MarkdownIt from 'markdown-it';
 import texmath from 'markdown-it-texmath';
 import katex from 'katex';
 import { Client } from '@stomp/stompjs';
+import BasicInfo from '@/components/project/BasicInfo.vue';
 
 const md = new MarkdownIt({
 	html: true, // 启用 HTML 标签解析
@@ -244,7 +207,7 @@ const messages = ref([
 	// { id: 4, type: 'text', content: '以下是一个表格：\n\n| 列1 | 列2 |\n|-----|-----|\n| 单元格1 | 单元格2 |\n\n这是一个 [链接](https://example.com) 和一些 `行内代码`。' },
 ]); // 用于存储聊天消息
 const userInput = ref(''); // 用户输入的消息
-const activeTab = ref('files');
+const activeTab = ref('basic');
 
 let stompClient = null;
 const fileData = ref([]); // 文件树数据
@@ -259,6 +222,10 @@ onMounted(async () => {
 	//   router.push("/");
 	// }
 	await fetchData();
+	const getFolderTreeResponse = await getFolderTree(
+		Number(stata.project.project_id),
+	);
+	fileData.value = getFolderTreeResponse.data;
 	const getHyparaByProjectIdResponse = await getHyparasByProjectId(
 		Number(stata.project.project_id),
 	);
@@ -295,29 +262,9 @@ const fetchData = async () => {
 			ProjectId: Number(stata.project.projectId),
 		});
 		stata.project = getProjectResponse.data;
-
-		const getFolderTreeResponse = await getFolderTree(
-			Number(stata.project.project_id),
-		);
-		fileData.value = getFolderTreeResponse.data;
 	} catch (error) {
 		console.error('数据获取失败:', error);
 	}
-};
-
-const saveHyperparameters = async () => {
-	const newObject = {
-		ProjectId: stata.project.projectId,
-		...stata.hyperparameters,
-	};
-	const addHyparaOfProjectResponse = await addHyparaOfProject(newObject);
-	if (addHyparaOfProjectResponse.resultCode == 200) {
-		ElMessage.success('保存成功');
-	} else {
-		ElMessage.error('保存失败');
-	}
-
-	await fetchData();
 };
 
 let isTrain = false;
