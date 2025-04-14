@@ -48,7 +48,7 @@
 							<!-- 根据文件类型判断展示方式 -->
 							<div v-if="isTextFile" class="file-content">
 								<highlightjs
-									language="python"
+									:language="language"
 									:code="fileContent"
 								/>
 							</div>
@@ -141,7 +141,8 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import { getLocal } from '@/utils/local';
 import Stomp from 'stompjs';
 import SockJS from 'sockjs-client/dist/sockjs.min.js';
-import { getFile, getPicture } from '@/service/project';
+import { downloadByPath } from '@/service/pic';
+import { getFile } from '@/service/project';
 import 'highlight.js/lib/common';
 import hljsVuePlugin from '@highlightjs/vue-plugin';
 import 'highlight.js/styles/github.css';
@@ -153,9 +154,9 @@ import katex from 'katex';
 import { Client } from '@stomp/stompjs';
 import BasicInfo from '@/components/project/BasicInfo.vue';
 import { MimeType } from '@/utils/MimeType.js'; // 引入 mimeTypeMap
+import hljs from 'highlight.js/lib/core';
 
 const highlightjs = hljsVuePlugin.component;
-console.log(`output->highlightjs.`, highlightjs.listLanguages());
 
 const md = new MarkdownIt({
 	html: true, // 启用 HTML 标签解析
@@ -223,6 +224,7 @@ const fileContent = ref(null); // 文件内容
 const isTextFile = ref(false);
 const isImageFile = ref(false);
 let intervalId = null;
+const language = ref('python'); // 默认语言为 Python
 
 onMounted(async () => {
 	stata.userId = getLocal('userId');
@@ -574,10 +576,9 @@ const handleFileClicked = async (fileInfo) => {
 			fileContent.value = response.data.file_content;
 			isTextFile.value = true;
 			isImageFile.value = false;
-		} else if (['png', 'jpg', 'jpeg'].includes(fileExtension)) {
-			const response = await getPicture({
-				Path: 'project/' + stata.project.projectId + '/' + filePath,
-			});
+			language.value = MimeType(fileExtension).split('/')[1]; // 获取语言类型
+		} else if (MimeType(fileExtension).startsWith('image/')) {
+			const response = await downloadByPath(filePath);
 			console.log(response);
 			// 将响应内容作为 Blob 数据处理
 			const blob = response; // 直接从 response 获取 Blob
@@ -709,21 +710,14 @@ const downloadFile = async (type) => {
 
 .file-image {
 	max-width: 100%;
-	/* 图片最大宽度为容器宽度 */
 	height: auto;
-	/* 高度自适应，保持图片比例 */
 	display: block;
-	/* 去除图片下方的空白间隙 */
 	margin: 0 auto;
-	/* 图片居中显示 */
 	border-radius: 4px;
-	/* 图片圆角 */
 	border: 1px solid #ddd;
-	/* 图片边框 */
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-	/* 图片阴影 */
 	transition: all 0.3s ease;
-	/* 图片过渡效果 */
+	cursor: pointer;
 }
 
 .file-image:hover {

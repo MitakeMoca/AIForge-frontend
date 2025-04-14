@@ -62,13 +62,6 @@ export function getFile(file_path) {
     return axios.get(`/Project/file/${encodeURIComponent(file_path)}`);
 }
 
-export function getPicture(params) {
-    return axios.get('/Pic/downloadbypath', {
-        params: params, // 将路径作为查询参数
-        responseType: "blob", // 指定响应类型为 blob
-    });
-}
-
 export function project2model(project_id) {
     return axios.put(`/Project/transfor2model/${project_id}`);
 }

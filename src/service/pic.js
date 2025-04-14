@@ -1,8 +1,9 @@
 import axios from '../utils/axios'
 
-// 根据pub返回指定pub的Model列表，公开是pub = 1，私有是pub = 0
-export function downloadByPath(params) {
-  return axios.post(`/Pic/downloadbypath`, params)
+export function downloadByPath(file_path) {
+  return axios.get(`Pic/path/${encodeURIComponent(file_path)}`, {
+    responseType: "blob", 
+  })
 }
 
 export function downloadByUserId(params) {
