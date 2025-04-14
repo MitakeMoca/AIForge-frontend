@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
+    "@highlightjs/vue-plugin": "^2.1.0",
     "@stomp/stompjs": "^7.1.0",
     "axios": "^1.7.7",
     "blob": "^0.1.0",
@@ -23,7 +24,7 @@
     "element-plus": "^2.9.0",
     "frontend": "file:",
     "global": "^4.4.0",
-    "highlight.js": "^11.11.0",
+    "highlight.js": "^11.11.1",
     "jszip": "^3.10.1",
     "katex": "^0.16.18",
     "lucide-vue-next": "^0.465.0",

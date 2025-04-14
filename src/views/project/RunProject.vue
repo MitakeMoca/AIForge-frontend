@@ -47,7 +47,10 @@
 						<div v-if="fileContent">
 							<!-- 根据文件类型判断展示方式 -->
 							<div v-if="isTextFile" class="file-content">
-								<pre><code ref="codeBlock" class="language-python">{{ fileContent }}</code></pre>
+								<highlightjs
+									language="python"
+									:code="fileContent"
+								/>
 							</div>
 							<div v-if="isImageFile" class="file-content">
 								<img
@@ -139,7 +142,8 @@ import { getLocal } from '@/utils/local';
 import Stomp from 'stompjs';
 import SockJS from 'sockjs-client/dist/sockjs.min.js';
 import { getFile, getPicture } from '@/service/project';
-import hljs from 'highlight.js';
+import 'highlight.js/lib/common';
+import hljsVuePlugin from '@highlightjs/vue-plugin';
 import 'highlight.js/styles/github.css';
 import Blob from 'blob-polyfill';
 import axios from 'axios'; // 用于请求文件内容
@@ -148,6 +152,10 @@ import texmath from 'markdown-it-texmath';
 import katex from 'katex';
 import { Client } from '@stomp/stompjs';
 import BasicInfo from '@/components/project/BasicInfo.vue';
+import { MimeType } from '@/utils/MimeType.js'; // 引入 mimeTypeMap
+
+const highlightjs = hljsVuePlugin.component;
+console.log(`output->highlightjs.`, highlightjs.listLanguages());
 
 const md = new MarkdownIt({
 	html: true, // 启用 HTML 标签解析
@@ -552,24 +560,20 @@ const sendMessage = async () => {
 const handleFileClicked = async (fileInfo) => {
 	activeTab.value = 'files';
 
+	console.log(`output->fileInfo`, fileInfo);
 	const filePath = fileInfo.path;
-	const fileExtension = filePath.split('.').pop();
-
+	// 比如 Dockerfile
+	const fileExtension = filePath.includes('.')
+		? filePath.split('.').pop()
+		: filePath.split('\\').pop();
+	console.log(`output->fileExtension`, fileExtension);
 	try {
-		if (fileExtension === 'py' || fileExtension === 'txt') {
-			const response = await getFile({
-				FilePath: 'project/' + stata.project.projectId + '/' + filePath,
-			});
-			fileContent.value = response.data.fileContent;
+		console.log(filePath, fileExtension);
+		if (MimeType(fileExtension).startsWith('text/')) {
+			const response = await getFile(filePath);
+			fileContent.value = response.data.file_content;
 			isTextFile.value = true;
 			isImageFile.value = false;
-
-			nextTick(() => {
-				const codeBlock = codeBlockRef.value; // 使用 ref 引用 code 标签
-				if (codeBlock) {
-					hljs.highlightElement(codeBlock);
-				}
-			});
 		} else if (['png', 'jpg', 'jpeg'].includes(fileExtension)) {
 			const response = await getPicture({
 				Path: 'project/' + stata.project.projectId + '/' + filePath,
@@ -584,6 +588,7 @@ const handleFileClicked = async (fileInfo) => {
 			ElMessage.error('不支持的文件类型');
 		}
 	} catch (error) {
+		console.log(`output->error`, error);
 		ElMessage.error('无法加载文件内容');
 	}
 };
@@ -692,7 +697,7 @@ const downloadFile = async (type) => {
 	/* 边框圆角 */
 	overflow: auto;
 	/* 超出部分显示滚动条 */
-	max-height: 500px;
+	max-height: 80vh;
 	/* 最大高度 */
 	line-height: 1.6;
 	/* 行高 */

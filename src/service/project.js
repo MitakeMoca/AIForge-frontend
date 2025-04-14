@@ -58,8 +58,8 @@ export function getFolderTree(project_id) {
     return axios.get(`/Project/tree/${project_id}`);
 }
 
-export function getFile(params) {
-    return axios.post('/Project/getfile', params);
+export function getFile(file_path) {
+    return axios.get(`/Project/file/${encodeURIComponent(file_path)}`);
 }
 
 export function getPicture(params) {
