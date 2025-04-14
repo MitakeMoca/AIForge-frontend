@@ -17,7 +17,7 @@
 			</el-button>
 		</div>
 
-		<el-aside width="30%">
+		<el-aside width="22%">
 			<div class="project-filter-container">
 				<h2>项目文件</h2>
 
@@ -789,6 +789,12 @@ const downloadFile = async (type) => {
 
 .el-button {
 	margin-left: 10px;
+}
+
+:deep(.file-content) {
+	pre code.hljs {
+		font-size: 20px;
+	}
 }
 
 /* 添加一些基本的 Markdown 样式 */
