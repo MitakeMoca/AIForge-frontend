@@ -358,7 +358,7 @@ const startDocker = async (command) => {
 	});
 	const runDockerResponse = await runDocker({
 		project_id: Number(stata.project.project_id),
-		command: command + '.py',
+		command: command,
 		hypara: findHyparaByPathResponse.data,
 	});
 	handleLogMessage({
