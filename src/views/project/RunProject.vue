@@ -369,7 +369,7 @@ const startDocker = async (command) => {
 	});
 	console.log(runDockerResponse);
 	if (runDockerResponse.resultCode == 200) {
-		ElMessage.success(command == 'train' ? '开始训练' : '开始测试');
+		ElMessage.success(command == 'train' ? '训练完成' : '开始测试');
 	} else {
 		ElMessage.error('无法运行!');
 		return;
