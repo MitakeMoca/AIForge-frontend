@@ -12,3 +12,11 @@ export function downloadByUserId(params) {
     responseType: "blob", // 如果返回的是文件内容，指定返回类型为 blob
   })
 }
+
+export function addPicture() {
+  return axios.post('/Pic', {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
+}

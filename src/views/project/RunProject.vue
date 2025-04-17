@@ -103,11 +103,25 @@
 
 						<!-- Input Area -->
 						<el-footer class="chat-footer">
+							<el-upload
+								class="upload-demo"
+								:on-success="sendFile"
+								:show-file-list="false"
+							>
+								<el-icon
+									:size="30"
+									color="#409EFF"
+									style="margin-top: 5px; margin-left: -10px"
+								>
+									<Paperclip class="paperclip" />
+								</el-icon>
+							</el-upload>
 							<el-input
 								v-model="userInput"
 								placeholder="聊点什么..."
 								@keyup.enter="sendMessage"
 								:rows="1"
+								class="chat-input"
 							/>
 							<el-button
 								@click="sendMessage"
@@ -155,6 +169,8 @@ import { Client } from '@stomp/stompjs';
 import BasicInfo from '@/components/project/BasicInfo.vue';
 import { MimeType } from '@/utils/MimeType.js'; // 引入 mimeTypeMap
 import hljs from 'highlight.js/lib/core';
+import { Paperclip } from '@element-plus/icons-vue';
+import { addPicture } from '@/service/pic.js';
 
 const highlightjs = hljsVuePlugin.component;
 
@@ -555,6 +571,25 @@ const sendMessage = async () => {
 			content: userInput.value,
 		});
 		userInput.value = ''; // 清空输入框
+	}
+};
+
+const sendFile = async (file) => {
+	if (file.status === 'success') {
+		// 先将文件存在后端
+		const filePath = await addPicture();
+		// const filePath = file.response.data.file_path;
+		console.log(`output->filePath`, filePath);
+		if (!isConnected) {
+			console.log('WebSocket 未连接，正在尝试连接...');
+			connectWebSocket(); // 尝试连接 WebSocket
+		}
+		const runDockerResponse = await runDocker({
+			Project_id: Number(stata.project.projectId),
+			command: 'predict.py',
+			hypara: { file_path: filePath },
+		});
+		console.log(runDockerResponse);
 	}
 };
 
