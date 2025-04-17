@@ -78,14 +78,11 @@
 								class="message"
 								:class="msg.from"
 							>
-								<!--                <p v-if="msg.type === 'text'" class="message-text">-->
-								<!--                  <span v-html="md.render(msg.content)"></span>-->
-								<!--                </p>-->
-								<div
+								<span
 									v-if="msg.type === 'text'"
 									v-html="renderMarkdown(msg.content)"
 									class="message-text"
-								></div>
+								></span>
 								<img
 									v-if="msg.type === 'image'"
 									:src="msg.content"
@@ -508,9 +505,9 @@ const subscribeToChat = (socket) => {
 };
 
 let logsSet = new Set();
+let messageSet = new Set();
 // 处理日志消息
 const handleLogMessage = (message) => {
-	console.log(`output->messgea`, message);
 	const newLog = message;
 	if (logsSet.has(newLog.message_id)) return;
 	const currentDate = new Date();
@@ -527,13 +524,15 @@ const handleLogMessage = (message) => {
 
 // 处理聊天消息
 const handleChatMessage = (message) => {
-	const response = message;
-	console.log(response.message);
+	const newChat = message;
+	if (messageSet.has(newChat.message_id)) return;
 	messages.value.push({
 		id: Date.now(),
+		from: 'bot',
 		type: 'text',
-		content: response.message,
+		content: newChat.message,
 	});
+	messageSet.add(newChat.message_id);
 };
 
 // 发送消息
@@ -596,8 +595,40 @@ const sendFile = async (file) => {
 			type: 'image',
 			content: filePath,
 		});
+
+		// 启动 Docker
+		if (
+			stata.project.status == 'init' ||
+			stata.project.status == 'stopped' ||
+			stata.project.status == 'finished' ||
+			stata.project.status == 'wait'
+		) {
+			const createDockerResponse = await createDocker(
+				Number(stata.project.project_id),
+			);
+			if (
+				createDockerResponse.resultCode != 200 &&
+				['403'].includes(createDockerResponse.data)
+			) {
+				ElMessage.error('启动失败, 请重试');
+				return;
+			}
+		} else if (stata.project.status == 'running') {
+			// 一般情况下不会出现，出现的时候需要先暂停运行
+			const stopDockerResponse = await stopDocker(
+				Number(stata.project.projectId),
+			);
+			const createDockerResponse = await createDocker(
+				Number(stata.project.project_id),
+			);
+			if (createDockerResponse.resultCode != 200) {
+				ElMessage.error('启动失败, 请重试');
+				return;
+			}
+		}
+
 		const runDockerResponse = await runDocker({
-			Project_id: Number(stata.project.projectId),
+			project_id: Number(stata.project.project_id),
 			command: 'predict',
 			hypara: { file_path: filePath },
 		});
@@ -815,13 +846,16 @@ const downloadFile = async (type) => {
 	margin-left: 10px;
 }
 
-.message.text {
-	background-color: #f1f1f1;
-	color: black;
+.message.bot {
+	background-color: #e0e0e0;
+	color: #333;
 	text-align: left;
 	align-self: flex-start;
 	margin: 6px 0px 12px;
-	/* 回答消息靠左 */
+	border-radius: 10px;
+	max-width: 60%;
+	word-wrap: break-word;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .message.image img {
@@ -864,14 +898,15 @@ const downloadFile = async (type) => {
 		margin-bottom: 0.5em;
 	}
 
-	p {
-		margin-bottom: 1em;
-	}
-
 	code {
 		background-color: #f0f0f0;
 		padding: 2px 4px;
 		border-radius: 4px;
+	}
+
+	p {
+		margin: 0 !important;
+		margin-top: 15px !important;
 	}
 
 	pre {
