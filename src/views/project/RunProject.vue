@@ -76,7 +76,7 @@
 								v-for="msg in messages"
 								:key="msg.id"
 								class="message"
-								:class="msg.type"
+								:class="msg.from"
 							>
 								<!--                <p v-if="msg.type === 'text'" class="message-text">-->
 								<!--                  <span v-html="md.render(msg.content)"></span>-->
@@ -105,7 +105,8 @@
 						<el-footer class="chat-footer">
 							<el-upload
 								class="upload-demo"
-								:on-success="sendFile"
+								:auto-upload="false"
+								:on-change="sendFile"
 								:show-file-list="false"
 							>
 								<el-icon
@@ -567,7 +568,8 @@ const sendMessage = async () => {
 		// 将用户输入添加到聊天记录
 		messages.value.push({
 			id: Date.now(),
-			type: 'user',
+			from: 'user',
+			type: 'text',
 			content: userInput.value,
 		});
 		userInput.value = ''; // 清空输入框
@@ -575,18 +577,28 @@ const sendMessage = async () => {
 };
 
 const sendFile = async (file) => {
-	if (file.status === 'success') {
+	console.log(`output->mooo`, file, file.status);
+	if (file.status === 'ready') {
 		// 先将文件存在后端
-		const filePath = await addPicture();
+		const formData = new FormData();
+		formData.append('file', file.raw);
+		const filePath = await addPicture(formData);
 		// const filePath = file.response.data.file_path;
 		console.log(`output->filePath`, filePath);
 		if (!isConnected) {
 			console.log('WebSocket 未连接，正在尝试连接...');
 			connectWebSocket(); // 尝试连接 WebSocket
 		}
+		file.status = 'success';
+		messages.value.push({
+			id: Date.now(),
+			from: 'user',
+			type: 'image',
+			content: filePath,
+		});
 		const runDockerResponse = await runDocker({
 			Project_id: Number(stata.project.projectId),
-			command: 'predict.py',
+			command: 'predict',
 			hypara: { file_path: filePath },
 		});
 		console.log(runDockerResponse);
@@ -790,9 +802,17 @@ const downloadFile = async (type) => {
 .message {
 	padding: 3px 13px;
 	border-radius: 10px;
-	max-width: 70%;
+	max-width: 45%;
 	word-wrap: break-word;
 	white-space: pre-wrap;
+}
+
+.message-image {
+	max-width: 100%;
+}
+
+.chat-input {
+	margin-left: 10px;
 }
 
 .message.text {

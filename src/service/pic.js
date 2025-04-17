@@ -1,4 +1,5 @@
-import axios from '../utils/axios'
+import axios from '@/utils/axios'
+import { baseURL } from '@/utils/axios'
 
 export function downloadByPath(file_path) {
   return axios.get(`Pic/path/${encodeURIComponent(file_path)}`, {
@@ -13,10 +14,12 @@ export function downloadByUserId(params) {
   })
 }
 
-export function addPicture() {
-  return axios.post('/Pic', {
+export async function addPicture(params) {
+  const ret = await axios.post('/Pic/', params, {
     headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  })
+    'Content-Type': 'multipart/form-data',
+    }}
+  )
+  console.log(`output->ret`,ret)
+  return `${baseURL}${ret.data.file_path}`
 }

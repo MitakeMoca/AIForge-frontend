@@ -2,6 +2,7 @@ import axios from 'axios'
 // import { setLocal } from '@/common/js/utils'
 // import router from '../router'
 
+export const baseURL = 'http://localhost:8084' //后端的URL
 console.log('import.meta.env', import.meta.env)
 
 axios.defaults.baseURL = 'http://localhost:8084' //后端的URL
