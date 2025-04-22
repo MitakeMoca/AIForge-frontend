@@ -545,7 +545,7 @@ const steps = [
 	{ number: 1, label: '选择产线' },
 	{ number: 2, label: '数据准备' },
 	{ number: 3, label: '参数准备' },
-	{ number: 4, label: '提交训练' },
+	{ number: 4, label: '领域选择' },
 ];
 
 const currentStep = ref(1);
