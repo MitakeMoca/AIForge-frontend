@@ -537,52 +537,65 @@ const handleChatMessage = (message) => {
 
 // 发送消息
 const sendMessage = async () => {
-	if (stata.project.status == 'init' || stata.project.status == 'stopped') {
-		const createDockerResponse = await createDocker(
-			Number(stata.project.project_id),
-		);
-		if (
-			createDockerResponse.resultCode != 200 &&
-			['403'].includes(createDockerResponse.data)
-		) {
-			ElMessage.error('启动失败, 请重试');
-			return;
-		}
-	} else if (stata.project.status == 'running') {
-		ElMessage.error('项目正在工作, 请稍后再试');
-		return;
-	}
-	if (!isConnected) {
-		console.log('WebSocket 未连接，正在尝试连接...');
-		connectWebSocket(); // 尝试连接 WebSocket
-	}
 	if (userInput.value.trim()) {
-		const runDockerResponse = await runDocker({
-			Project_id: Number(stata.project.projectId),
-			command: 'predict.py',
-			hypara: { message: userInput.value },
-		});
-		console.log(runDockerResponse);
-
-		// 将用户输入添加到聊天记录
+		if (!isConnected) {
+			console.log('WebSocket 未连接，正在尝试连接...');
+			connectWebSocket(); // 尝试连接 WebSocket
+		}
 		messages.value.push({
 			id: Date.now(),
 			from: 'user',
 			type: 'text',
 			content: userInput.value,
 		});
-		userInput.value = ''; // 清空输入框
+		let msg = userInput.value;
+		userInput.value = '';
+
+		// 启动 Docker
+		if (
+			stata.project.status == 'init' ||
+			stata.project.status == 'stopped' ||
+			stata.project.status == 'finished' ||
+			stata.project.status == 'wait'
+		) {
+			const createDockerResponse = await createDocker(
+				Number(stata.project.project_id),
+			);
+			if (
+				createDockerResponse.resultCode != 200 &&
+				['403'].includes(createDockerResponse.data)
+			) {
+				ElMessage.error('启动失败, 请重试');
+				return;
+			}
+		} else if (stata.project.status == 'running') {
+			// 一般情况下不会出现，出现的时候需要先暂停运行
+			const stopDockerResponse = await stopDocker(
+				Number(stata.project.projectId),
+			);
+			const createDockerResponse = await createDocker(
+				Number(stata.project.project_id),
+			);
+			if (createDockerResponse.resultCode != 200) {
+				ElMessage.error('启动失败, 请重试');
+				return;
+			}
+		}
+
+		const runDockerResponse = await runDocker({
+			project_id: Number(stata.project.project_id),
+			command: 'predict',
+			hypara: { file_path: msg, is_file: false },
+		});
 	}
 };
 
 const sendFile = async (file) => {
-	console.log(`output->mooo`, file, file.status);
 	if (file.status === 'ready') {
 		// 先将文件存在后端
 		const formData = new FormData();
 		formData.append('file', file.raw);
 		const filePath = await addPicture(formData);
-		// const filePath = file.response.data.file_path;
 		console.log(`output->filePath`, filePath);
 		if (!isConnected) {
 			console.log('WebSocket 未连接，正在尝试连接...');
@@ -630,9 +643,8 @@ const sendFile = async (file) => {
 		const runDockerResponse = await runDocker({
 			project_id: Number(stata.project.project_id),
 			command: 'predict',
-			hypara: { file_path: filePath },
+			hypara: { file_path: filePath, is_file: true },
 		});
-		console.log(runDockerResponse);
 	}
 };
 
