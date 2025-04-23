@@ -36,6 +36,10 @@ export function updateTestSetOfProject(params) {
     return axios.post(`/Project/test_dataset/${params.project_id}/${params.dataset_id}`);
 }
 
+export function updateFieldOfProject(params) {
+    return axios.post(`/Project/field/${params.project_id}/${params.field}`);
+}
+
 //根据ProjectId, 获取project的全部内容
 export function getProject(params) {
     return axios.get(`/Project/${params.ProjectId}`)

@@ -544,6 +544,7 @@ import {
 	updateModelOfProject,
 	updateProjectTypeOfProject,
 	updateTestSetOfProject,
+	updateFieldOfProject,
 } from '@/service/project.js';
 import { getHyparaByModelId } from '@/service/hypara.js';
 import { getTagDetail } from '@/service/tag.js';
@@ -574,7 +575,7 @@ const steps = [
 	{ number: 4, label: '领域选择' },
 ];
 
-const currentStep = ref(4);
+const currentStep = ref(1);
 const projectTypes = [
 	'多模态模型',
 	'基础模型',
@@ -870,6 +871,10 @@ function saveConfig() {
 	updateTestSetOfProject({
 		project_id: projectId.value,
 		dataset_id: form.value.testSet.dataset_id,
+	});
+	updateFieldOfProject({
+		project_id: projectId.value,
+		field: form.value.selectedField,
 	});
 	const params = {
 		params: { ...form.value.params },
