@@ -5,8 +5,24 @@
 			<p><strong>名称:</strong> {{ stata.project.project_name }}</p>
 			<p><strong>状态:</strong> {{ stata.project.status }}</p>
 			<p><strong>描述:</strong> {{ stata.project.description }}</p>
+			<p><strong>项目领域:</strong> {{ stata.project.project_field }}</p>
 			<p><strong>创建时间:</strong> {{ stata.project.create_time }}</p>
 			<p><strong>更改时间:</strong> {{ stata.project.update_time }}</p>
+			<p>
+				<strong>项目优先级（值越大，项目优先级越高）:</strong>
+				<el-select
+					v-model="priority"
+					placeholder="请选择优先级"
+					style="width: 100px; margin-left: 15px"
+				>
+					<el-option
+						v-for="item in priorities"
+						:key="item"
+						:value="item"
+						:label="item"
+					></el-option>
+				</el-select>
+			</p>
 		</div>
 
 		<div class="hyperparameters">
@@ -50,6 +66,9 @@ const props = defineProps({
 		required: true,
 	},
 });
+
+const priorities = [1, 2, 3, 4, 5];
+const priority = ref(1);
 
 const saveHyperparameters = async () => {
 	const newObject = {
