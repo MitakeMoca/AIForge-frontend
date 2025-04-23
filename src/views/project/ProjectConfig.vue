@@ -430,6 +430,24 @@
 					>
 						去升级
 					</p>
+
+					<el-form-item size="large" label="选择领域" prop="model">
+						<el-select
+							style="width: 400px"
+							v-model.trim="form.selectedField"
+							size="large"
+							placeholder="请选择学科"
+							filterable
+							clearable
+						>
+							<el-option
+								v-for="subject in subjects"
+								:key="subject"
+								:label="subject"
+								:value="subject"
+							></el-option>
+						</el-select>
+					</el-form-item>
 				</div>
 			</div>
 			<div class="body-bottom-line"></div>
@@ -493,6 +511,7 @@ import { ref, reactive, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import MarkdownIt from 'markdown-it';
 import { getLocal } from '@/utils/local.js';
+import { subjects } from '@/assets/data.ts';
 
 import PreviousStepIcon from '@/assets/icon/PreviousStepIcon.vue';
 import BackIcon from '@/assets/icon/BackIcon.vue';
@@ -600,6 +619,7 @@ const form = ref({
 	trainSet: null,
 	params: {},
 	model_id: 0,
+	selectedField: 'No field',
 });
 
 const hyperparameters = ref({});
