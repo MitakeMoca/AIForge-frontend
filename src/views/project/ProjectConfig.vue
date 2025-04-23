@@ -431,8 +431,15 @@
 						去升级
 					</p>
 
-					<el-form-item size="large" label="选择领域" prop="model">
+					<el-form-item
+						size="large"
+						label="选择领域"
+						class="subject"
+						prop="model"
+						style="margin-left: 150px"
+					>
 						<el-select
+							class="custom-select"
 							style="width: 400px"
 							v-model.trim="form.selectedField"
 							size="large"
@@ -567,7 +574,7 @@ const steps = [
 	{ number: 4, label: '领域选择' },
 ];
 
-const currentStep = ref(1);
+const currentStep = ref(4);
 const projectTypes = [
 	'多模态模型',
 	'基础模型',
@@ -1141,5 +1148,45 @@ function saveConfig() {
 
 .button {
 	cursor: pointer;
+}
+
+.custom-select {
+	/* 覆盖默认的边框样式 */
+	border-radius: 10px !important;
+	background-color: #f5f7fa !important;
+	color: #333 !important;
+	font-size: 16px !important;
+	padding: 10px !important;
+}
+
+.custom-select .el-input__inner {
+	/* 覆盖输入框的样式 */
+	border: none !important;
+	border-radius: 10px !important;
+	background-color: #f5f7fa !important;
+	color: #333 !important;
+	font-size: 16px !important;
+	padding: 10px !important;
+}
+
+.custom-select .el-select-dropdown__item {
+	/* 覆盖下拉菜单项的样式 */
+	color: #333 !important;
+	font-size: 16px !important;
+	padding: 0px !important;
+}
+
+.custom-select .el-select-dropdown__item:hover {
+	/* 覆盖下拉菜单项的悬停样式 */
+	background-color: #e6f7ff !important;
+	color: #409eff !important;
+}
+
+:deep(.subject > .el-form-item__label) {
+	font-size: 24px;
+	color: #2c3e50;
+	vertical-align: middle;
+	position: relative;
+	top: 10px;
 }
 </style>
