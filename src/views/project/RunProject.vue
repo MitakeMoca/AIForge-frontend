@@ -169,6 +169,7 @@ import { MimeType } from '@/utils/MimeType.js'; // 引入 mimeTypeMap
 import hljs from 'highlight.js/lib/core';
 import { Paperclip } from '@element-plus/icons-vue';
 import { addPicture } from '@/service/pic.js';
+import { baseURL } from '@/utils/axios.js';
 
 const highlightjs = hljsVuePlugin.component;
 
@@ -431,7 +432,21 @@ const deriveModel = async () => {
 				Number(stata.project.project_id),
 			);
 
+			console.log(`output->project2modelResponse`, project2modelResponse);
+			let model_id = project2modelResponse.data.id;
+
 			if (project2modelResponse.resultCode === 200) {
+				ElMessageBox.alert(
+					`模型导出成功！<br />
+					<strong>API 接口地址：</strong>${baseURL}/api/model/${model_id}<br />
+					<strong>secret-key（秘钥只出现一次，请牢记秘钥）: <br /></strong>
+					${project2modelResponse.data.secret_key}`,
+					'导出成功',
+					{
+						dangerouslyUseHTMLString: true,
+						confirmButtonText: '确定',
+					},
+				);
 				ElMessage.success('导出模型成功！');
 			} else {
 				ElMessage.error(
