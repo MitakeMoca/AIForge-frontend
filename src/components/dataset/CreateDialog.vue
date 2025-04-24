@@ -2,7 +2,7 @@
 	<div class="dialog-wrapper">
 		<div class="dialog">
 			<div class="dialog-header">
-				<h3>创建数据集</h3>
+				<h3>上传数据集</h3>
 				<button class="close-btn" @click="endCreate">×</button>
 			</div>
 

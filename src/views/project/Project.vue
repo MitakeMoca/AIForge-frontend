@@ -63,7 +63,7 @@ import Sidebar from '@/components/Sidebar.vue';
 import Upperbar from '@/components/Upperbar.vue';
 import { getLocal } from '@/utils/local.js';
 import { createProject } from '@/service/project.js';
-import CreateDialog from '@/components/CreateDialog.vue';
+import CreateDialog from '@/components/dataset/CreateDialog.vue';
 import CreateIcon from '@/assets/icon/CreateIcon.vue';
 import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';

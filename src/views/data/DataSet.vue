@@ -29,9 +29,14 @@
 						>我的数据集</a
 					>
 				</div>
-				<button class="create-button" @click="startCreate()">
-					创建数据集
-				</button>
+				<div>
+					<button class="preprocess-button" @click="startProcess()">
+						数据集预处理
+					</button>
+					<button class="create-button" @click="startCreate()">
+						上传数据集
+					</button>
+				</div>
 			</div>
 		</div>
 
@@ -185,6 +190,7 @@
 	</div>
 
 	<CreateDialog v-if="isCreating" @closeCreatePage="closeCreate()" />
+	<ProcessDialog v-if="isProcessing" @closeCreatePage="closeProcess()" />
 </template>
 
 <script setup>
@@ -192,7 +198,8 @@ import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import { SearchIcon } from 'lucide-vue-next';
 import { reactive } from 'vue';
-import CreateDialog from '@/components/CreateDialog.vue';
+import CreateDialog from '@/components/dataset/CreateDialog.vue';
+import ProcessDialog from '@/components/dataset/ProcessDialog.vue';
 import Sidebar from '@/components/Sidebar.vue';
 import Upperbar from '@/components/Upperbar.vue';
 import { useRouter } from 'vue-router'; // 获取路由实例
@@ -394,11 +401,18 @@ const myDatasetsByCategory = computed(() => {
 
 //用来打开或关闭创建数据集界面
 const isCreating = ref(false);
+const isProcessing = ref(false);
 function startCreate() {
 	isCreating.value = true;
 }
 function closeCreate() {
 	isCreating.value = false;
+}
+function startProcess() {
+	isProcessing.value = true;
+}
+function closeProcess() {
+	isProcessing.value = false;
 }
 
 //这个方法用来打开数据集详情界面
@@ -457,6 +471,16 @@ onMounted(() => {
 .nav-link.active {
 	color: #4f46e5;
 	border-bottom: 2px solid #4f46e5;
+}
+
+.preprocess-button {
+	background-color: #4caf50;
+	color: white;
+	padding: 0.5rem 1rem;
+	border-radius: 0.375rem;
+	border: none;
+	cursor: pointer;
+	margin-right: 20px;
 }
 
 .create-button {

@@ -525,7 +525,7 @@ import BackIcon from '@/assets/icon/BackIcon.vue';
 import TickIcon from '@/assets/icon/TickIcon.vue';
 import DatasetIcon from '@/assets/icon/DatasetIcon.vue';
 import DeleteIcon from '@/assets/icon/DeleteIcon.vue';
-import CreateDialog from '@/components/CreateDialog.vue';
+import CreateDialog from '@/components/dataset/CreateDialog.vue';
 import TestIcon from '@/assets/icon/TestIcon.vue';
 
 import {
