@@ -28,6 +28,12 @@
 				<el-icon :size="30"><Coin /></el-icon>
 				<template #title><span>数据</span></template>
 			</el-menu-item>
+			<el-menu-item index="/ragnork">
+				<el-icon :size="30"><Switch /></el-icon>
+				<template #title
+					><span style="margin-left: 20px">RAGnork</span></template
+				>
+			</el-menu-item>
 		</el-menu>
 	</aside>
 </template>
@@ -42,6 +48,7 @@ import {
 	Coin,
 	Expand,
 	Fold,
+	Switch,
 } from '@element-plus/icons-vue';
 
 const isCollapse = ref(

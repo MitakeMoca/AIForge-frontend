@@ -4,6 +4,7 @@ import ModelDetail from '../views/Model/ModelDetail.vue';
 import ProjectConfig from "@/views/project/ProjectConfig.vue";
 import MyProject from "@/views/project/MyProject.vue";
 import MyCollect from "@/views/project/MyCollect.vue";
+import RagNork from "@/views/RagNork.vue";
 
 import Manage from '@/views/manage/Manage.vue';
 const router = createRouter({
@@ -120,6 +121,11 @@ const router = createRouter({
 			path: '/dataProcessing',
 			name: 'dataProcessing',
 			component: () => import('@/views/data/DataProcessing.vue'),
+		},
+		{
+			path: '/ragnork',
+			name: 'RagNork',
+			component: RagNork,
 		}
 	]
 })
