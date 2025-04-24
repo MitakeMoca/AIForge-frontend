@@ -10,7 +10,7 @@
 			<!-- Header Section -->
 			<div class="header-section">
 				<h1 class="title">
-					{{ dataset.dataSetName }}
+					{{ dataset.dataset_name }}
 				</h1>
 				<p class="short_des">{{ dataset.introduction }}</p>
 				<div class="stats">
@@ -55,7 +55,7 @@
 							<div class="main-file-item">
 								<span>DataSet{{ file.name }}.zip</span>
 								<span class="file-size"
-									>({{ dataset.dataSize }}MB)</span
+									>({{ dataset.data_size }}MB)</span
 								>
 								<button class="download-btn" @click="download">
 									下载
@@ -98,7 +98,12 @@ import { ref, onMounted, computed } from 'vue';
 import { toRefs } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
-import { findDatasetById, findDatasetbyUserid } from '@/service/dataset';
+import {
+	findDatasetById,
+	findDatasetbyUserid,
+	get_dataset_files,
+	downloadData,
+} from '@/service/dataset';
 import Sidebar from '@/components/Sidebar.vue';
 import Upperbar from '@/components/Upperbar.vue';
 import JSZip from 'jszip';
@@ -139,9 +144,19 @@ const fetchDataset = async () => {
 			return '';
 		});
 
+		files.value.forEach((file) => {
+			// 获取文件名后缀
+			const nameParts = file.name.split('.');
+			console.log(`output->nameParts`, nameParts);
+			const fileExtension = nameParts.length > 1 ? nameParts.pop() : '';
+
+			// 添加文件后缀作为一个新字段
+			file.extension = fileExtension;
+		});
+
 		// 请求用户名
 
-		fetchUserName(dataset.value.userId);
+		fetchUserName(dataset.value.user_id);
 	} catch (error) {
 		console.error('Error fetching dataset:', error);
 	}
@@ -153,7 +168,11 @@ const fetchUserName = async (userId) => {
 	try {
 		const response = await findDatasetbyUserid({ UserId: userId });
 		if (dataset.value) {
-			dataset.value.UserName = response.data.username;
+			dataset.value.UserName = response.data[0].user_id;
+			console.log(
+				`output->dataset.value.userName`,
+				dataset.value.userName,
+			);
 		}
 	} catch (error) {
 		console.error('Error fetching UserName:', error);
@@ -171,11 +190,7 @@ function getFiles(node) {
 //获取文件树
 const fetchFileAttribute = async () => {
 	try {
-		const response = await axios.get('Dataset/getDatasetFiles', {
-			params: {
-				datasetId: idValue,
-			},
-		});
+		const response = await get_dataset_files(idValue);
 		console.log(response.data);
 		file.value = response.data;
 		getFiles(file.value);
@@ -184,32 +199,11 @@ const fetchFileAttribute = async () => {
 	}
 };
 
-files.value.forEach((file) => {
-	// 将 size 转换为 MB 并保留两位小数
-	const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
-	file.size = `${sizeInMB} MB`;
-
-	// 获取文件名后缀
-	const nameParts = file.name.split('.');
-	const fileExtension = nameParts.length > 1 ? nameParts.pop() : '';
-
-	// 添加文件后缀作为一个新字段
-	file.extension = fileExtension;
-});
-
 // 方法：下载文件
 const download = async () => {
 	try {
 		console.log(idValue);
-		const response = await axios.post(
-			'/Dataset/downloadFiles',
-			{
-				DatasetId: idValue,
-			},
-			{
-				responseType: 'blob', // 确保返回的是二进制数据
-			},
-		);
+		const response = await downloadData(idValue);
 		console.log(response.data);
 		const url = window.URL.createObjectURL(new Blob([response]));
 		const link = document.createElement('a');
@@ -400,7 +394,7 @@ onMounted(() => {
 }
 
 .download-btn {
-	margin-left: auto;
+	margin-left: 5px;
 	margin-top: 10px;
 	padding: 2px 8px;
 	background-color: #4834d4;

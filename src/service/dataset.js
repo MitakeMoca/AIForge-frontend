@@ -29,8 +29,8 @@ export function deleteDataset(params) {
   return axios.post('/Dataset/delete', params)
 }
 
-export function downloadData(params) {
-  return axios.post('/Dataset/downloadFiles', params, {
+export function downloadData(dataset_id) {
+  return axios.get(`/Dataset/download/{dataset_id}`, {
     responseType: 'blob'
   });
 }
@@ -39,4 +39,8 @@ export function add_dataset(params) {
   return axios.put('/Dataset/', params, {
     responseType: 'blob'
   });
+}
+
+export function get_dataset_files(dataset_id) {
+  return axios.get(`/Dataset/files/${dataset_id}`);
 }

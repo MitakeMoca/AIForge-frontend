@@ -112,7 +112,7 @@
 			<div class="dataset-list" v-if="allDataSetIsV">
 				<div
 					v-for="dataset in datasetByCategory"
-					:key="dataset.dataSetId"
+					:key="dataset.dataset_id"
 					class="dataset-card"
 				>
 					<div class="dataset-header">
@@ -120,7 +120,7 @@
 							<span class="dataset-tag">精</span>
 							<h3
 								class="dataset-title"
-								@click="goToDataPage(dataset.dataSetId)"
+								@click="goToDataPage(dataset.dataset_id)"
 							>
 								{{ dataset['dataset_name'] }}
 							</h3>
@@ -358,6 +358,7 @@ const otherDatasets = computed(() => {
 
 // 以下是通过函数获取数据集中对应标签的数据集
 const datasetByCategory = computed(() => {
+	console.log(`output->datasets`, datasets);
 	if (category.value === '全部') {
 		return datasets.value;
 	} else if (category.value === '计算机视觉') {
