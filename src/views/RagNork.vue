@@ -7,6 +7,20 @@
 	</aside>
 	<div class="ragnork-container">
 		<div class="flow-container">
+			<span class="buttons">
+				<button
+					@click="openKnowledgeDialog"
+					style="background-color: #4caf50; margin-right: 30px"
+				>
+					添加知识领域
+				</button>
+				<button
+					@click="openOtherModelDialog"
+					style="background-color: #4f46e5"
+				>
+					添加辅助模型
+				</button>
+			</span>
 			<VueFlow
 				v-model:nodes="nodes"
 				v-model:edges="edges"
@@ -40,6 +54,10 @@
 						>
 							<!-- 左侧 Handle -->
 							<Handle
+								v-if="
+									nodeProps.data.norkType != 'RAG' &&
+									nodeProps.data.norkType != 'other'
+								"
 								type="target"
 								:position="Position.Left"
 								:id="`in-${nodeProps.id}`"
@@ -47,6 +65,7 @@
 							/>
 							<!-- 右侧 Handle -->
 							<Handle
+								v-if="nodeProps.data.norkType != 'other'"
 								type="source"
 								:position="Position.Right"
 								:id="`out-${nodeProps.id}`"
@@ -57,8 +76,16 @@
 								v-if="nodeProps.data.norkType == 'main'"
 								type="source"
 								:position="Position.Top"
-								:id="`out-${nodeProps.id}`"
+								:id="`top-${nodeProps.id}`"
 								style="top: -60px"
+							/>
+							<!-- 下侧 Handle -->
+							<Handle
+								v-if="nodeProps.data.norkType == 'other'"
+								type="source"
+								:position="Position.Bottom"
+								:id="`top-${nodeProps.id}`"
+								style="bottom: -60px"
 							/>
 						</div>
 					</div>
@@ -66,29 +93,6 @@
 			</VueFlow>
 		</div>
 
-		<div class="ragnork-sidebar">
-			<h3>辅助模型列表</h3>
-			<el-button
-				v-for="(model, index) in availableModels"
-				:key="index"
-				@click="addAuxiliaryModel(model)"
-			>
-				{{ model.name }}
-			</el-button>
-		</div>
-
-		<div class="auxiliary-models">
-			<h3>已选辅助模型</h3>
-			<div
-				v-for="(model, index) in selectedModels"
-				:key="index"
-				class="auxiliary-model"
-			>
-				<el-button @click="removeAuxiliaryModel(index)">
-					{{ model.name }} <i class="el-icon-close"></i>
-				</el-button>
-			</div>
-		</div>
 		<el-dialog
 			v-model="inputDialogVisible"
 			title="请输入 Prompt"
@@ -133,6 +137,95 @@
 				</button>
 			</span>
 		</el-dialog>
+
+		<el-dialog v-model="outputDialogVisible" title="输出内容" width="30%">
+			<div>
+				<p v-if="!outputText">正在推理中...</p>
+				<p v-else>{{ outputText }}</p>
+			</div>
+			<span slot="footer" class="main-dialog-footer">
+				<button
+					@click="closeOutputDialog"
+					style="background-color: #4f46e5"
+				>
+					关闭
+				</button>
+			</span>
+		</el-dialog>
+
+		<el-dialog
+			v-model="knowledgeDialogVisible"
+			title="选择知识领域"
+			width="30%"
+		>
+			<el-select
+				filterable
+				v-model="selectedKnowledgeArea"
+				placeholder="请选择一个知识领域"
+			>
+				<el-option
+					v-for="area in availableKnowledgeAreas.filter(
+						(area) =>
+							!selectedKnowledgeAreas
+								.map((a) => a)
+								.includes(area),
+					)"
+					:key="area.id"
+					:label="area.name"
+					:value="area"
+				></el-option>
+			</el-select>
+			<span slot="footer" class="main-dialog-footer">
+				<button
+					@click="addKnowledgeArea"
+					style="background-color: #4caf50"
+				>
+					添加
+				</button>
+				<button
+					@click="cancelKnowledgeArea"
+					style="background-color: #4f46e5"
+				>
+					取消
+				</button>
+			</span>
+		</el-dialog>
+
+		<el-dialog
+			v-model="othermodelDialogVisible"
+			title="选择知识领域"
+			width="30%"
+		>
+			<el-select
+				filterable
+				v-model="selectedModel"
+				placeholder="请选择一个辅助模型"
+			>
+				<el-option
+					v-for="area in otherAvailableModels.filter(
+						(area) =>
+							!otherSelectedModels.map((a) => a).includes(area),
+					)"
+					:key="area.id"
+					:label="area.model_name"
+					:value="area"
+				></el-option>
+			</el-select>
+			<span slot="footer" class="main-dialog-footer">
+				<button
+					@click="addOtherModel"
+					style="background-color: #4caf50"
+				>
+					添加
+				</button>
+				<button
+					@click="cancelOtherModel"
+					style="background-color: #4f46e5"
+				>
+					取消
+				</button>
+			</span>
+		</el-dialog>
 	</div>
 </template>
 
@@ -142,18 +235,19 @@ import { VueFlow, Handle, Position } from '@vue-flow/core';
 import { ElButton, ElDialog } from 'element-plus';
 import Sidebar from '@/components/Sidebar.vue';
 import Upperbar from '@/components/Upperbar.vue';
-import { findAllModel } from '@/service/model.js';
+import { findAllModel, RAGnork } from '@/service/model.js';
+import { subjects } from '@/assets/data.ts';
 
 onMounted(async () => {
 	await fetchModelList();
-	console.log(`output->`, mainModelList.value);
+	availableKnowledgeAreas.value = subjects;
+	console.log(
+		`output->availableKnowledgeAreas.value`,
+		availableKnowledgeAreas.value,
+	);
 });
 
-const availableModels = ref([
-	{ name: '模型A' },
-	{ name: '模型B' },
-	{ name: '模型C' },
-]);
+const availableModels = ref([]);
 const selectedModels = ref([]);
 
 const nodes = ref([
@@ -182,35 +276,6 @@ const edges = ref([
 	{ id: 'e2-3', source: 'main', target: 'output' },
 ]);
 
-const configureMainModel = () => {
-	alert('配置主模型功能尚未实现');
-};
-
-const addAuxiliaryModel = (model) => {
-	selectedModels.value.push(model);
-	const newNode = {
-		id: `aux-${model.name}`,
-		type: 'default',
-		position: { x: 250, y: 150 + selectedModels.value.length * 100 },
-		data: { label: model.name },
-	};
-	nodes.value.push(newNode);
-	edges.value.push({
-		id: `e-aux-${model.name}`,
-		source: `aux-${model.name}`,
-		target: 'main',
-	});
-};
-
-const removeAuxiliaryModel = (index) => {
-	const model = selectedModels.value[index];
-	selectedModels.value.splice(index, 1);
-	nodes.value = nodes.value.filter((node) => node.id !== `aux-${model.name}`);
-	edges.value = edges.value.filter(
-		(edge) => edge.id !== `e-aux-${model.name}`,
-	);
-};
-
 const handleNodeClick = (nodeProps) => {
 	const { id, data } = nodeProps;
 	switch (data.norkType) {
@@ -238,10 +303,11 @@ const saveInput = () => {
 	inputDialogVisible.value = false;
 };
 
-const runRagnork = () => {
+const runRagnork = async () => {
 	// 运行 RAGnork 的逻辑
-	console.log('运行 RAGnork');
+	outputText.value = '';
 	inputDialogVisible.value = false;
+	outputText.value = (await RAGnork(inputValue.value)).data;
 };
 
 // 主模型节点的部分
@@ -254,18 +320,107 @@ const fetchModelList = async () => {
 		// 模拟从后端获取模型列表
 		const data = await findAllModel();
 		mainModelList.value = data.data;
+		otherAvailableModels.value = data.data;
 	} catch (error) {
 		console.error('获取模型列表失败:', error);
 		mainModelList.value = [];
 	}
 };
 
-const saveMainModel = () => {
+const cancelMainModel = () => {
 	mainModelDialogVisible.value = false;
 };
 
-const cancelMainModel = () => {
-	mainModelDialogVisible.value = false;
+// 输出节点的部分
+const outputDialogVisible = ref(false); // 控制输出弹窗的显示
+const outputText = ref('我就是一个 Agent'); // 输出的文本内容
+const closeOutputDialog = () => {
+	outputDialogVisible.value = false;
+};
+
+// 添加知识领域的部分
+const knowledgeDialogVisible = ref(false); // 控制知识领域弹窗的显示
+const availableKnowledgeAreas = ref([]); // 所有知识领域
+const selectedKnowledgeAreas = ref([]); // 已选择的知识领域
+const selectedKnowledgeArea = ref(null); // 当前选中的知识领域
+const fieldCnt = ref(0);
+
+const openKnowledgeDialog = () => {
+	knowledgeDialogVisible.value = true;
+};
+
+const addKnowledgeArea = () => {
+	if (selectedKnowledgeArea.value) {
+		const newNode = {
+			id: `knowledge-${selectedKnowledgeArea.value}`,
+			type: 'default',
+			position: { x: 350, y: 50 + fieldCnt.value * 150 },
+			data: {
+				label: selectedKnowledgeArea.value,
+				norkType: 'RAG',
+			},
+		};
+		const newEdge = {
+			id: `ki-${selectedKnowledgeArea.value}`,
+			source: newNode.id,
+			target: 'input',
+		};
+		fieldCnt.value = fieldCnt.value + 1;
+		nodes.value.push(newNode);
+		edges.value.push(newEdge);
+		selectedKnowledgeAreas.value.push(selectedKnowledgeArea.value);
+		selectedKnowledgeArea.value = null; // 清空当前选中项
+		knowledgeDialogVisible.value = false;
+	} else {
+		alert('请选择一个知识领域');
+	}
+};
+
+const cancelKnowledgeArea = () => {
+	knowledgeDialogVisible.value = false;
+};
+
+// 添加辅助模型的部分
+const othermodelDialogVisible = ref(false); // 控制知识领域弹窗的显示
+const otherAvailableModels = ref([]); // 所有知识领域
+const otherSelectedModels = ref([]); // 已选择的知识领域
+const selectedModel = ref(null); // 当前选中的知识领域
+const modelCnt = ref(0);
+
+const openOtherModelDialog = () => {
+	othermodelDialogVisible.value = true;
+};
+
+const addOtherModel = () => {
+	if (selectedModel.value) {
+		const newNode = {
+			id: `other-model-${selectedModel.value.id}`,
+			type: 'default',
+			position: { x: 600 + modelCnt.value * 105, y: 50 },
+			data: {
+				label: selectedModel.value.model_name,
+				norkType: 'other',
+			},
+		};
+		const newEdge = {
+			id: `om-${selectedModel.value.id}`,
+			source: newNode.id,
+			target: 'main',
+			targetHandle: 'top-main',
+		};
+		modelCnt.value = modelCnt.value + 1;
+		nodes.value.push(newNode);
+		edges.value.push(newEdge);
+		otherSelectedModels.value.push(selectedModel.value);
+		selectedModel.value = null; // 清空当前选中项
+		othermodelDialogVisible.value = false;
+	} else {
+		alert('请选择一个知识领域');
+	}
+};
+
+const cancelOtherModel = () => {
+	othermodelDialogVisible.value = false;
 };
 </script>
 
@@ -294,18 +449,6 @@ const cancelMainModel = () => {
 	color: white;
 	padding: 10px;
 	border-radius: 5px;
-}
-
-.ragnork-sidebar {
-	margin-top: 20px;
-}
-
-.auxiliary-models {
-	margin-top: 20px;
-}
-
-.auxiliary-model {
-	margin-bottom: 10px;
 }
 
 .vue-flow__node {
@@ -465,8 +608,9 @@ const cancelMainModel = () => {
 	right: 0;
 }
 
-.input-dialog-footer,
-.main-dialog-footer button {
+.input-dialog-footer button,
+.main-dialog-footer button,
+.buttons button {
 	color: white;
 	padding: 0.5rem 1rem;
 	border-radius: 0.125rem;
@@ -474,5 +618,9 @@ const cancelMainModel = () => {
 	cursor: pointer;
 	margin-right: 20px;
 	margin-top: 15px;
+}
+
+.buttons {
+	float: right;
 }
 </style>
