@@ -63,6 +63,7 @@ import axios from 'axios';
 import { ElProgress, ElButton, ElDialog } from 'element-plus';
 import { getLocal } from '@/utils/local';
 import { add_dataset } from '@/service/dataset.js';
+import router from '@/router/index.js';
 const uploading = ref(false);
 const uploadProgress = ref(0);
 
@@ -117,8 +118,22 @@ const formatSize = (size) => {
 	return `${(size / 1024 / 1024).toFixed(2)} MB`;
 };
 
+import { useFileStore } from '@/stores/filestore.ts';
+const fileStore = useFileStore();
+
 //点击确定按钮之后的逻辑处理
-const submitData = async () => {};
+const submitData = () => {
+	if (files.value.length === 0) {
+		ElMessage.error('请上传文件');
+		return;
+	}
+
+	fileStore.clearFiles(); // 清空之前的文件列表
+	fileStore.addFile(files.value[0]);
+
+	// 跳转到目标路由
+	router.push('/dataProcessing');
+};
 </script>
 
 <style scoped>
